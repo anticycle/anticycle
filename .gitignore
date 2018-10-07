@@ -4,9 +4,23 @@
 *.dll
 *.so
 *.dylib
+*_amd64
+*_amd64p32
+*_arm
+*_386
+*_ppc*
+*_mips*
+*_s390x
 
 # Test binary, build with `go test -c`
 *.test
 
 # Output of the go coverage tool, specifically when used with LiteIDE
 *.out
+
+# Built binary command
+/bin/
+
+# IDE stuff
+.idea/
+coverage.html
