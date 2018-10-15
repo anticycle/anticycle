@@ -1,4 +1,4 @@
-.PHONY: docs test
+.PHONY: docs test build
 .DEFAULT_GOAL := help
 
 help:
@@ -13,13 +13,10 @@ uninstall: ## uninstall project from OS
 clean: clean-build clean-coverage ## remove artifacts
 
 build: clean-build ## create artifacts
-	mkdir -p bin
-	gox -osarch="darwin/amd64 linux/amd64 linux/arm linux/arm64 windows/amd64" ./cmd/anticycle
-	mv anticycle_*_amd64* ./bin/
-	mv anticycle_*_arm* ./bin/
+	./build/artifacts.sh
 
 clean-build: ## remove linker artifacts
-	rm -f ./bin/*
+	rm -rf ./dist/*
 
 test: ## run tests
 	go test ./...
