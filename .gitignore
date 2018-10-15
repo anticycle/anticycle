@@ -1,4 +1,6 @@
 # Binaries for programs and plugins
+bin/
+dist/
 *.exe
 *.exe~
 *.dll
@@ -17,9 +19,6 @@
 
 # Output of the go coverage tool, specifically when used with LiteIDE
 *.out
-
-# Built binary command
-/bin/
 
 # IDE stuff
 .idea/
