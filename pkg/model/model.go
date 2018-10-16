@@ -21,32 +21,33 @@ type (
 
 	// File is a representation of source file with its path and list of imports.
 	File struct {
-		Path    string   `json:"path"`
-		Imports []string `json:"imports"`
+		Path    string        `json:"path"`
+		Imports []*ImportInfo `json:"imports"`
 	}
 
 	// Pkg is a higher level structure which has all information about its files and imports.
 	Pkg struct {
-		Name    string       `json:"name"`
-		Path    string       `json:"path"`
-		Imports Imports      `json:"imports"`
-		Files   []*File      `json:"files"`
-		Cycles  ImportsCycle `json:"cycles,omitempty"`
+		Name      string                 `json:"name"`
+		Path      string                 `json:"path"`
+		Imports   map[string]*ImportInfo `json:"imports"`
+		Files     []*File                `json:"files"`
+		Cycles    []*Cycle               `json:"cycles,omitempty"`
+		HaveCycle bool                   `json:"haveCycle"`
 	}
 
-	// Imports type holds information about package level imports fetched from all files in a package.
-	Imports      map[string]*ImportInfo
-	// ImportCycle is a back reference to a file which takes a part in cycle.
-	ImportsCycle map[string][]*File
+	Cycle struct {
+		AffectedImport *ImportInfo `json:"affectedImport"`
+		AffectedFile   string      `json:"affectedFile"`
+	}
 )
 
 // NewPkg creates new Pkg with empty imports, files and cycles arrays.
 // Will return pointer to Pkg structure.
 func NewPkg() *Pkg {
 	return &Pkg{
-		Imports: make(Imports),
+		Imports: make(map[string]*ImportInfo),
 		Files:   make([]*File, 0, 8),
-		Cycles:  make(ImportsCycle),
+		Cycles:  make([]*Cycle, 0),
 	}
 }
 
@@ -54,7 +55,7 @@ func NewPkg() *Pkg {
 // Will return pointer to File structure.
 func NewFile() *File {
 	return &File{
-		Imports: make([]string, 0, 8),
+		Imports: make([]*ImportInfo, 0, 8),
 	}
 }
 

@@ -13,19 +13,19 @@ import (
 func TestNewFile(t *testing.T) {
 	file := NewFile()
 	assert.Empty(t, file.Imports)
-	assert.IsType(t, []string{}, file.Imports)
+	assert.IsType(t, []*ImportInfo{}, file.Imports)
 }
 
 func TestNewPkg(t *testing.T) {
 	pkg := NewPkg()
 	assert.Empty(t, pkg.Imports)
-	assert.IsType(t, Imports{}, pkg.Imports)
+	assert.IsType(t, map[string]*ImportInfo{}, pkg.Imports)
 
 	assert.Empty(t, pkg.Files)
 	assert.IsType(t, []*File{}, pkg.Files)
 
 	assert.Empty(t, pkg.Cycles)
-	assert.IsType(t, ImportsCycle{}, pkg.Cycles)
+	assert.IsType(t, []*Cycle{}, pkg.Cycles)
 }
 
 func TestNewImportInfo(t *testing.T) {
