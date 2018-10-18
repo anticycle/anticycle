@@ -36,7 +36,7 @@ func newPackages(root map[string]*ast.Package, path string) []*model.Pkg {
 
 			for _, importSpec := range astFile.Imports {
 				importInfo := model.NewImportInfo(importSpec)
-				file.Imports = append(file.Imports, importInfo.Name)
+				file.Imports = append(file.Imports, importInfo)
 				pkg.Imports[importInfo.Name] = importInfo
 			}
 			pkg.Files = append(pkg.Files, file)

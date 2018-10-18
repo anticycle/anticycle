@@ -21,42 +21,35 @@ func TestShouldSkipDir(t *testing.T) {
 }
 
 func TestMakePackages(t *testing.T) {
-	root := map[string]*ast.Package{
-		"foo": {
-			Files: map[string]*ast.File{
-				"internal/pkg/foo/foo.go": {
-					Imports: []*ast.ImportSpec{
-						{
-							Path: &ast.BasicLit{Value: `"pkg/foo"`},
-						},
-					},
-				},
-			},
-		},
-	}
-
-	packages := newPackages(root, "internal/pkg/foo")
 	expected := []*model.Pkg{
 		{
 			Name: "foo",
 			Path: "internal/pkg/foo",
-			Imports: model.Imports{
-				"pkg/foo": {
-					Name:      "pkg/foo",
-					NameShort: "foo",
-					Alias:     nil,
-				},
+			Imports: map[string]*model.ImportInfo{
+				"pkg/foo": {Name: "pkg/foo", NameShort: "foo", Alias: nil},
 			},
 			Files: []*model.File{
 				{
-					Path:    "internal/pkg/foo/foo.go",
-					Imports: []string{"pkg/foo"},
+					Path: "internal/pkg/foo/foo.go",
+					Imports: []*model.ImportInfo{
+						{Name: "pkg/foo", NameShort: "foo", Alias: nil},
+					},
 				},
 			},
-			Cycles: make(model.ImportsCycle),
+			Cycles: []*model.Cycle{},
 		},
 	}
 
+	root := map[string]*ast.Package{
+		"foo": {
+			Files: map[string]*ast.File{
+				"internal/pkg/foo/foo.go": {
+					Imports: []*ast.ImportSpec{{Path: &ast.BasicLit{Value: `"pkg/foo"`}}},
+				},
+			},
+		},
+	}
+	packages := newPackages(root, "internal/pkg/foo")
 	assert.EqualValues(t, expected, packages)
 }
 
@@ -67,26 +60,31 @@ func TestMakePackages_WithEmptyRoot(t *testing.T) {
 }
 
 func TestWalkDir(t *testing.T) {
-	packages, err := walkDir("testdata/nocycle", []string{})
+	dir, remove := makeProjectNoCycles("walkDir")
+	defer remove()
+
+	expected := []string{"bar", "baz", "foo"}
+	packages, err := walkDir(dir, []string{})
 	assert.NoError(t, err)
 
 	result := make([]string, 0)
 	for _, pkg := range packages {
 		result = append(result, pkg.Name)
 	}
-	expected := []string{"main", "bar", "baz", "foo"}
 	assert.EqualValues(t, expected, result)
 }
 
 func TestWalkDir_WithExcludedDirs(t *testing.T) {
-	excluded := []string{"bar"}
-	packages, err := walkDir("testdata/nocycle", excluded)
+	dir, remove := makeProjectNoCycles("walkDirExcluded")
+	defer remove()
+	expected := []string{"baz", "foo"}
+
+	packages, err := walkDir(dir, []string{"bar"})
 	assert.NoError(t, err)
 
 	result := make([]string, 0)
 	for _, pkg := range packages {
 		result = append(result, pkg.Name)
 	}
-	expected := []string{"main", "foo"}
 	assert.EqualValues(t, expected, result)
 }

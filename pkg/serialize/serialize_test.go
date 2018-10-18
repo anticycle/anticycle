@@ -14,15 +14,13 @@ import (
 func TestToJson(t *testing.T) {
 	pkg := model.NewPkg()
 	pkg.Name = "test/pkg"
-	pkg.Imports = model.Imports{
-		"internal": model.NewImportInfo(nil),
-	}
+	pkg.Imports = map[string]*model.ImportInfo{"internal": model.NewImportInfo(nil)}
 
 	packages := []*model.Pkg{pkg}
 	jsonStr, err := ToJson(packages)
 	assert.NoError(t, err)
 
-	expected := `[{"name":"test/pkg","path":"","imports":{"internal":null},"files":[]}]`
+	expected := `[{"name":"test/pkg","path":"","imports":{"internal":null},"files":[],"haveCycle":false}]`
 	assert.Equal(t, expected, jsonStr)
 }
 
@@ -41,9 +39,9 @@ func TestToJson_WithEmptyInput(t *testing.T) {
 func ExampleToJson() {
 	pkg := model.NewPkg()
 	pkg.Name = "test/pkg"
-	pkg.Imports = model.Imports{"internal": model.NewImportInfo(nil)}
+	pkg.Imports = map[string]*model.ImportInfo{"internal": model.NewImportInfo(nil)}
 
 	jsonStr, _ := ToJson([]*model.Pkg{pkg})
 	fmt.Print(jsonStr)
-	// Output: [{"name":"test/pkg","path":"","imports":{"internal":null},"files":[]}]
+	// Output: [{"name":"test/pkg","path":"","imports":{"internal":null},"files":[],"haveCycle":false}]
 }

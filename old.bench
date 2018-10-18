@@ -1,0 +1,16 @@
+?   	github.com/anticycle/anticycle/cmd/anticycle	[no test files]
+goos: linux
+goarch: amd64
+pkg: github.com/anticycle/anticycle/internal/pkg/scan
+BenchmarkFindCycles_NoCycles-4         	 3000000	       457 ns/op	     104 B/op	       4 allocs/op
+BenchmarkFindCycles_OneToOne-4         	 2000000	       796 ns/op	     256 B/op	       6 allocs/op
+BenchmarkFindCycles_Triangle-4         	 1000000	      1010 ns/op	     335 B/op	       7 allocs/op
+BenchmarkFindCycles_DiagonalSquare-4   	 1000000	      1393 ns/op	     436 B/op	       9 allocs/op
+PASS
+ok  	github.com/anticycle/anticycle/internal/pkg/scan	6.740s
+PASS
+ok  	github.com/anticycle/anticycle/pkg/anticycle	0.003s
+PASS
+ok  	github.com/anticycle/anticycle/pkg/model	0.003s
+PASS
+ok  	github.com/anticycle/anticycle/pkg/serialize	0.003s

@@ -29,5 +29,12 @@ clean-coverage: ## clean coverage report
 	rm -f *.out
 	rm -f coverage.html
 
+benchmark: ## run test benchmark
+	go test -run=xxx -bench=. ./... > new.bench
+	benchcmp old.bench new.bench
+
+benchmark-save: ## save new benchmark as old
+	mv new.bench old.bench
+
 format: ## reformat sourcecode
 	go fmt ./...
