@@ -22,5 +22,6 @@ dist/
 
 # IDE stuff
 .idea/
+.vscode/
 coverage.html
 new.bench

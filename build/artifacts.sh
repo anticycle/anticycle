@@ -15,6 +15,6 @@ do
     filename="${filename}.exe"
   fi
 
-  env GOOS=${os_name} GOARCH=${os_arch} go build -ldflags="-X main.version=$(git describe --tags --always --long --dirty)" \
+  env GOOS=${os_name} GOARCH=${os_arch} go build -ldflags="-X main.version=$(./build/version.sh)" \
                                                  -o ./dist/${os_name}/${filename} ./cmd/anticycle
 done
