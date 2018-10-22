@@ -56,13 +56,13 @@ func tmpFile(dir, filename, data string) (*os.File, error) {
 
 func makeProjectNoCycles(testName string) (string, func()) {
 	dir, remove := tmpDir(testName)
-	packages := []struct{Name, Data string}{
+	packages := []struct{ Name, Data string }{
 		{"foo", "package foo\nimport \"bar/bar\""},
 		{"bar", "package bar\nimport \"fmt\""},
 		{"baz", "package baz\nimport \"bar/bar\""},
 	}
 
-	if err:= _generateProject(dir, packages); err != nil {
+	if err := _generateProject(dir, packages); err != nil {
 		remove()
 		fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)
@@ -73,13 +73,13 @@ func makeProjectNoCycles(testName string) (string, func()) {
 
 func makeProjectOneToOne(testName string) (string, func()) {
 	dir, remove := tmpDir(testName)
-	packages := []struct{Name, Data string}{
+	packages := []struct{ Name, Data string }{
 		{"foo", "package foo"},
 		{"bar", "package bar\nimport \"baz/baz\""},
 		{"baz", "package baz\nimport \"bar/bar\""},
 	}
 
-	if err:= _generateProject(dir, packages); err != nil {
+	if err := _generateProject(dir, packages); err != nil {
 		remove()
 		fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)
@@ -90,13 +90,13 @@ func makeProjectOneToOne(testName string) (string, func()) {
 
 func makeProjectTriangle(testName string) (string, func()) {
 	dir, remove := tmpDir(testName)
-	packages := []struct{Name, Data string}{
+	packages := []struct{ Name, Data string }{
 		{"foo", "package foo\nimport \"baz/baz\""},
 		{"bar", "package bar\nimport \"foo/foo\""},
 		{"baz", "package baz\nimport \"bar/bar\""},
 	}
 
-	if err:= _generateProject(dir, packages); err != nil {
+	if err := _generateProject(dir, packages); err != nil {
 		remove()
 		fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)
@@ -107,14 +107,14 @@ func makeProjectTriangle(testName string) (string, func()) {
 
 func makeProjectDiagonalSquare(testName string) (string, func()) {
 	dir, remove := tmpDir(testName)
-	packages := []struct{Name, Data string}{
+	packages := []struct{ Name, Data string }{
 		{"foo", "package foo\nimport \"pas/pas\""},
 		{"bar", "package bar\nimport \"foo/foo\""},
 		{"baz", "package baz\nimport \"bar/bar\""},
 		{"pas", "package pas\nimport \"baz/baz\""},
 	}
 
-	if err:= _generateProject(dir, packages); err != nil {
+	if err := _generateProject(dir, packages); err != nil {
 		remove()
 		fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)
@@ -123,7 +123,7 @@ func makeProjectDiagonalSquare(testName string) (string, func()) {
 	return dir, remove
 }
 
-func _generateProject(dir string, packages []struct{Name, Data string}) error {
+func _generateProject(dir string, packages []struct{ Name, Data string }) error {
 	for _, pkg := range packages {
 		_, err := tmpFile(filepath.Join(dir, pkg.Name), fmt.Sprintf("%v.go", pkg.Name), pkg.Data)
 		if err != nil {
