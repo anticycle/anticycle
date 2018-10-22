@@ -34,7 +34,7 @@ func ExcludeDirs(custom []string) []string {
 // Analyze is a high level function which will parse recursively all .go files.
 // Will produce slice with information about packages, files and import statements.
 // Analyze will not compile the code. It looks only at imports in AST data.
-func Analyze(dir string, excludedDir []string) ([]*model.Pkg, error) {
+func Analyze(dir string, excludedDir []string, allPkgs bool) ([]*model.Pkg, error) {
 	// TODO: make integration tests
 	packages, err := scan.FetchPackages(dir, excludedDir)
 	if err != nil {
@@ -45,5 +45,17 @@ func Analyze(dir string, excludedDir []string) ([]*model.Pkg, error) {
 	if err != nil {
 		return nil, err
 	}
-	return cycles, nil
+
+	var result []*model.Pkg
+	if allPkgs == false {
+		for _, pkg := range cycles {
+			if pkg.HaveCycle == true {
+				result = append(result, pkg)
+			}
+		}
+	} else {
+		result = cycles
+	}
+
+	return result, nil
 }

@@ -16,6 +16,8 @@ import (
 	"strings"
 )
 
+var version = "undefined"
+
 const helpText = `Usage: anticycle [options] [directory]
 
   Anticycle is a tool for static code analysis which search for 
@@ -24,23 +26,37 @@ const helpText = `Usage: anticycle [options] [directory]
   so it is ideal for searching for complex, difficult to debug cycles.
 
 Options:
+  -all               Output all packages.
+  -format            Output format. Available: text,json
+
   -exclude=""        A comma separated list of directories that should 
                      not be scanned. The list will be added to the 
                      default list of directories.
   -excludeOnly=""    A comma separated list of directories that should 
                      not be scanned. The list will override the default.
   -showExclude       Shows default list of excluded directories.
+
   -help              Shows this help text.
+  -version           Shows version tag.
 
 Directory:
   An optional path to the analyzed project. If the directory is not 
   defined, the current working directory will be used.
 
 Output:
-  The output of the Anticycle is JSON string containing package names, 
+  The output of the Anticycle is a text by default with human friendly
+  format of cycle affected package, import and filename.
+  
+  You can specify json format with -format=json flag.
+  The JSON contains package names, 
   all dependencies in the package, a list of files belonging to 
-  the package and their individual dependencies. If Anticycle does not 
-  find any source files, it will exit with code 0 without output.
+  the package and their individual dependencies.
+
+  By default output will contain only cycles to reduce a clutter.
+  If you want to print all packages you can use -all flag.
+
+  If Anticycle does not find any source files, it will exit 
+  with code 0 without output.
   In case of error, the program will exit with code 1, and the error 
   message will be sent to stderr.`
 
@@ -52,15 +68,24 @@ func trap(err error) {
 }
 
 func main() {
-	help := flag.Bool("help", false, "Show help text")
+	showHelp := flag.Bool("help", false, "Show help text")
+	showVersion := flag.Bool("version", false, "Show version tag")
 	showEx := flag.Bool("showExclude", false, "Show default list of excluded directories")
-	ex := flag.String("exclude", "", "A comma separated list of directories")
-	exO := flag.String("excludeOnly", "", "A comma separated list of directories")
+	ex := flag.String("exclude", "", "A space-separated list of directories")
+	exO := flag.String("excludeOnly", "", "A space-separated list of directories")
+	format := flag.String("format", "text", "Output format. Available: text,json")
+	all := flag.Bool("all", false, "Output all packages")
 	flag.Parse()
 
 	// SHOW HELP TEXT
-	if *help == true {
+	if *showHelp == true {
 		fmt.Fprintln(os.Stdout, helpText)
+		os.Exit(0)
+	}
+
+	// SHOW VERSION
+	if *showVersion == true {
+		fmt.Fprintln(os.Stdout, version)
 		os.Exit(0)
 	}
 
@@ -73,11 +98,14 @@ func main() {
 	// EXCLUDE ONLY
 	exclude := make([]string, 0)
 	if *exO != "" {
-		anticycle.DefaultExcluded = strings.Split(*exO, ",")
+		paths := strings.Trim(*exO, "\"'")
+		anticycle.DefaultExcluded = strings.Split(paths, " ")
 	}
+
 	// EXCLUDE
 	if *ex != "" {
-		exclude = append(exclude, strings.Split(*ex, ",")...)
+		paths := strings.Trim(*ex, "\"'")
+		exclude = append(exclude, strings.Split(paths, " ")...)
 	}
 
 	// DIRECTORY
@@ -88,10 +116,18 @@ func main() {
 		dir = "."
 	}
 
+	var err error
+	var output string
+
 	excluded := anticycle.ExcludeDirs(exclude)
-	cycles, err := anticycle.Analyze(dir, excluded)
+	cycles, err := anticycle.Analyze(dir, excluded, *all)
 	trap(err)
-	output, err := serialize.ToJson(cycles)
+
+	if strings.ToLower(*format) == "json" {
+		output, err = serialize.ToJson(cycles)
+	} else {
+		output, err = serialize.ToTxt(cycles)
+	}
 	trap(err)
 	if output != "" {
 		fmt.Fprintln(os.Stdout, output)
