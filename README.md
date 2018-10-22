@@ -16,16 +16,18 @@ anticycle [options] [directory]
 ### Options
 
 ```
+-all               Output all packages. Default: false.
+-format            Output format. Available: text,json. Default: text.
+
 -exclude=""        A comma separated list of directories that should
                    not be scanned. The list will be added to the
                    default list of directories.
-
 -excludeOnly=""    A comma separated list of directories that should
                    not be scanned. The list will override the default.
-
 -showExclude       Shows default list of excluded directories.
 
 -help              Shows this help text.
+-version           Shows version tag.
 ```
 
 ### Directory
@@ -44,7 +46,7 @@ $ anticycle -exclude="internal"
 Analyze recursively given directory
 
 ```console
-$ anticycle $GOPATH/src/github.com/anticycle/anticycle
+$ anticycle $GOPATH/src/github.com/anticycle/anticycle -all -format=json
 ```
 
 ## Development
