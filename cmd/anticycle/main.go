@@ -26,8 +26,8 @@ const helpText = `Usage: anticycle [options] [directory]
   so it is ideal for searching for complex, difficult to debug cycles.
 
 Options:
-  -all               Output all packages.
-  -format            Output format. Available: text,json
+  -all               Output all packages. Default: false.
+  -format            Output format. Available: text,json. Default: text.
 
   -exclude=""        A comma separated list of directories that should 
                      not be scanned. The list will be added to the 
