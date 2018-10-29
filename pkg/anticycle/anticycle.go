@@ -6,9 +6,10 @@
 package anticycle
 
 import (
+	"sort"
+
 	"github.com/anticycle/anticycle/internal/pkg/scan"
 	"github.com/anticycle/anticycle/pkg/model"
-	"sort"
 )
 
 // DefaultExcluded is a default list of directories which should be skipped while analyzing.

@@ -1,0 +1,12 @@
+bar
+  testdata/onetoone/bar/bar.go
+    C "testdata/onetoone/baz"
+
+baz
+  testdata/onetoone/baz/baz.go
+    C "testdata/onetoone/bar"
+    C "testdata/onetoone/foo"
+
+foo
+  testdata/onetoone/foo/foo.go
+

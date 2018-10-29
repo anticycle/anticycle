@@ -5,9 +5,10 @@
 package model
 
 import (
-	"github.com/stretchr/testify/assert"
 	"go/ast"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
 func TestNewFile(t *testing.T) {

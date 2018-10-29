@@ -5,8 +5,9 @@
 package scan
 
 import (
-	"github.com/anticycle/anticycle/pkg/model"
 	"strings"
+
+	"github.com/anticycle/anticycle/pkg/model"
 )
 
 func FetchPackages(dir string, excluded []string) ([]*model.Pkg, error) {

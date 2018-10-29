@@ -6,9 +6,10 @@ package serialize
 
 import (
 	"fmt"
+	"testing"
+
 	"github.com/anticycle/anticycle/pkg/model"
 	"github.com/stretchr/testify/assert"
-	"testing"
 )
 
 func TestToJson(t *testing.T) {

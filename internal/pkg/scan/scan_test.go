@@ -5,9 +5,10 @@
 package scan
 
 import (
+	"testing"
+
 	"github.com/anticycle/anticycle/pkg/model"
 	"github.com/stretchr/testify/assert"
-	"testing"
 )
 
 func TestFetchPackages(t *testing.T) {

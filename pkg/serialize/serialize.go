@@ -8,9 +8,10 @@ package serialize
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/anticycle/anticycle/pkg/model"
 	"sort"
 	"strings"
+
+	"github.com/anticycle/anticycle/pkg/model"
 )
 
 // ToJson takes list of packages and produces JSON string.
