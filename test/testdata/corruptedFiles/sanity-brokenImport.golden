@@ -1,1 +1,1 @@
-testdata/corruptedFiles/brokenImport/brokenImport.go:8:5: string literal not terminated
+testdata/corruptedFiles/brokenImport/brokenImport.go:8:2: string literal not terminated

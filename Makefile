@@ -13,7 +13,7 @@ uninstall: ## uninstall project from OS
 clean: clean-build clean-coverage ## remove artifacts
 
 build: clean-build ## create artifacts
-	./build/artifacts.sh
+	./build/artifacts.sh ./dist ./cmd/anticycle
 
 clean-build: ## remove linker artifacts
 	rm -rf ./dist/*

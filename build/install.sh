@@ -1,2 +1,8 @@
 #!/usr/bin/env bash
-go install -ldflags="-X main.version=$(./build/version.sh)" $1
+# Install project in $GOPATH/bin
+version=($("$(dirname "$0")/version.sh"))
+ld=(
+    "-X main.version=${version[0]}"
+    "-X main.build=${version[1]}"
+)
+go install -ldflags="${ld[*]}" $1

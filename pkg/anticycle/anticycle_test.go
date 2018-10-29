@@ -6,8 +6,9 @@ package anticycle
 
 import (
 	"fmt"
-	"github.com/stretchr/testify/assert"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
 func TestExcludeDirs(t *testing.T) {

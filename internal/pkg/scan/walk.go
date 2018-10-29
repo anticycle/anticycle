@@ -5,13 +5,14 @@
 package scan
 
 import (
-	"github.com/anticycle/anticycle/pkg/model"
 	"go/ast"
 	"go/parser"
 	"go/token"
 	"os"
 	"path/filepath"
 	"sort"
+
+	"github.com/anticycle/anticycle/pkg/model"
 )
 
 func shouldSkip(pathName string, excluded []string) bool {

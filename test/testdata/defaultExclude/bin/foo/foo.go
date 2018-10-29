@@ -4,4 +4,7 @@
 
 package foo
 
-import "fmt"
+import (
+	"fmt"
+)
+

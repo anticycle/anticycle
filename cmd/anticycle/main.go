@@ -9,14 +9,16 @@ package main
 import (
 	"flag"
 	"fmt"
-	"github.com/anticycle/anticycle/pkg/anticycle"
-	"github.com/anticycle/anticycle/pkg/serialize"
 	"os"
 	"path"
 	"strings"
+
+	"github.com/anticycle/anticycle/pkg/anticycle"
+	"github.com/anticycle/anticycle/pkg/serialize"
 )
 
 var version = "undefined"
+var build = "undefined"
 
 const helpText = `Usage: anticycle [options] [directory]
 
@@ -26,18 +28,18 @@ const helpText = `Usage: anticycle [options] [directory]
   so it is ideal for searching for complex, difficult to debug cycles.
 
 Options:
-  -all               Output all packages. Default: false.
-  -format            Output format. Available: text,json. Default: text.
+  -all               Output all packages.
+  -format="text"     Output format. Available: text, json.
 
-  -exclude=""        A comma separated list of directories that should 
+  -exclude=""        A space-separated list of directories that should 
                      not be scanned. The list will be added to the 
                      default list of directories.
-  -excludeOnly=""    A comma separated list of directories that should 
+  -excludeOnly=""    A space-separated list of directories that should 
                      not be scanned. The list will override the default.
   -showExclude       Shows default list of excluded directories.
 
   -help              Shows this help text.
-  -version           Shows version tag.
+  -version           Shows version and build hash.
 
 Directory:
   An optional path to the analyzed project. If the directory is not 
@@ -85,7 +87,7 @@ func main() {
 
 	// SHOW VERSION
 	if *showVersion == true {
-		fmt.Fprintln(os.Stdout, version)
+		fmt.Fprintln(os.Stdout, fmt.Sprintf("Anticycle version %s, build %s", version, build))
 		os.Exit(0)
 	}
 

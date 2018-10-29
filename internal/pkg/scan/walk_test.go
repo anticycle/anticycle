@@ -5,10 +5,11 @@
 package scan
 
 import (
-	"github.com/anticycle/anticycle/pkg/model"
-	"github.com/stretchr/testify/assert"
 	"go/ast"
 	"testing"
+
+	"github.com/anticycle/anticycle/pkg/model"
+	"github.com/stretchr/testify/assert"
 )
 
 func TestShouldSkipDir(t *testing.T) {

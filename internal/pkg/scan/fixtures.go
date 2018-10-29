@@ -6,10 +6,6 @@ import (
 	"path/filepath"
 )
 
-const (
-	tmp = "anticycle"
-)
-
 func tmpDir(rootDir string) (string, func()) {
 	acTmp := fmt.Sprintf("%v/anticycle", os.TempDir())
 	if _, err := os.Stat(acTmp); os.IsNotExist(err) {

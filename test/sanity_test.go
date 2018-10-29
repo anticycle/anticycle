@@ -3,13 +3,14 @@ package test
 import (
 	"flag"
 	"fmt"
-	"github.com/anticycle/anticycle/pkg/anticycle"
-	"github.com/stretchr/testify/assert"
 	"io/ioutil"
 	"os/exec"
 	"path/filepath"
 	"strings"
 	"testing"
+
+	"github.com/anticycle/anticycle/pkg/anticycle"
+	"github.com/stretchr/testify/assert"
 )
 
 var update = flag.Bool("update", false, "update .golden files")
@@ -104,7 +105,6 @@ func TestCorruptedFiles(t *testing.T) {
 		Name, Golden string
 		Args         []string
 	}{
-		// no go file in directory scenario
 		{
 			Name:   "Broken import clause",
 			Args:   []string{"./testdata/corruptedFiles/brokenImport"},
