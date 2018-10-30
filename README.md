@@ -1,5 +1,7 @@
 # Anticycle
 
+[![CircleCI](https://circleci.com/gh/anticycle/anticycle.svg?style=svg)](https://circleci.com/gh/anticycle/anticycle)
+
 Anticycle is a tool for static code analysis which search for
 dependency cycles. It scans recursively all source files and
 parses theirs dependencies. Anticycle does not compile the code,

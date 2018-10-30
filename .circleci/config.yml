@@ -1,0 +1,73 @@
+# Golang CircleCI 2.0 configuration file
+#
+# Check https://circleci.com/docs/2.0/language-go/ for more details
+version: 2
+
+defaults: &defaults
+  docker:
+  - image: circleci/golang:1.10
+
+  #### TEMPLATE_NOTE: go expects specific checkout path representing url
+  #### expecting it in the form of
+  ####   /go/src/github.com/circleci/go-tool
+  ####   /go/src/bitbucket.org/circleci/go-tool
+  working_directory: /go/src/github.com/anticycle/anticycle
+
+jobs:
+  build:
+    <<: *defaults
+    steps:
+    - checkout
+    - run:
+        name: Build binaries
+        command: make build
+    - persist_to_workspace:
+        root: dist
+        paths:
+        - linux/anticycle_amd64
+        - linux/anticycle_arm
+        - darwin/anticycle_amd64
+        - windows/anticycle_amd64.exe
+
+  unit-tests:
+    <<: *defaults
+    steps:
+    - checkout
+    - run:
+        name: Run unit tests
+        command: make test
+
+  sanity-tests:
+    <<: *defaults
+    steps:
+    - checkout
+    - attach_workspace:
+        at: /tmp/artifacts
+    - run:
+        name: Move artifacts to executable path
+        command: |
+          mv /tmp/artifacts/linux/anticycle_amd64 /go/bin/anticycle
+    - run:
+        name: Run sanity tests
+        command: make test-sanity
+
+workflows:
+  version: 2
+  build-test-deploy:
+    jobs:
+    - build
+    - unit-tests:
+        requires:
+        - build
+    - sanity-tests:
+        requires:
+        - build
+# TODO (pawelzny): Add job: acceptance-tests with full coverage for CLI
+#    - acceptance-tests:
+#        requires:
+#        - build
+# TODO (pawelzny): Add job: deploy artifacts to github on new release
+#    - deploy:
+#        requires:
+#        - unit-tests
+#        - sanity-tests

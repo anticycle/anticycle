@@ -14,16 +14,17 @@ clean: clean-build clean-coverage ## remove artifacts
 
 build: clean-build ## create artifacts
 	./build/artifacts.sh ./dist ./cmd/anticycle
+	chmod a+x -R ./dist
 
 clean-build: ## remove linker artifacts
 	rm -rf ./dist/*
 
 test: ## run tests
-	go test ./pkg/...
-	go test ./internal/...
+	go test -v ./pkg/...
+	go test -v ./internal/...
 
 test-sanity: ## run sanity tests on builded binary
-	go test ./test/sanity_test.go
+	go test -v ./test/sanity_test.go
 
 test-all: test test-sanity ## run all tests
 
