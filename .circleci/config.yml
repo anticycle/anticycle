@@ -34,6 +34,9 @@ jobs:
     steps:
     - checkout
     - run:
+        name: Download dependencies
+        command: make deps
+    - run:
         name: Run linters
         command: make lint
 

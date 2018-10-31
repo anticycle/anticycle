@@ -1,32 +1,41 @@
 #!/usr/bin/env bash
-set -o xtrace
-set -o history
-set -o histexpand
-
-# Exit on any errors so that errors don't compound
-trap err_trap ERR
-function err_trap {
-    local r=$?
-    set +o xtrace
-    echo "command: '$BASH_COMMAND' failed with status code $r"
-    exit ${r}
-}
-
 # Vet examines Go source code and reports suspicious constructs.
 # https://golang.org/cmd/vet/
 function check_vet() {
+    echo "Check: go vet"
     for dir in "${@:2}"
     do
         go vet -source "$1$dir/..."
+        if [[ $? > 0 ]]; then
+            FAILED=1
+        fi
     done
 }
 
-# Prepare directories to check
-current_dir=$(dirname "$0")
-if [[ ${current_dir} == "." ]]; then
+# Golint is a linter for Go source code.
+# https://github.com/golang/lint
+function check_golint() {
+    echo "Check: golint"
+    for dir in  "${@:2}"
+    do
+        golint -set_exit_status "$1$dir/..."
+        if [[ $? > 0 ]]; then
+            FAILED=1
+        fi
+    done
+}
+
+# Failure flag
+FAILED=0
+
+# Prepare relative path to match project root directory
+current_dir=$(pwd)
+if [ -z "${current_dir##*tools*}" ]; then
+    # if "tools" in pwd then we want to go one directory up
     root_dir="../"
 else
-    root_dir="$current_dir/../"
+    # else stay where you are
+    root_dir="./"
 fi
 
 source_dirs=(
@@ -37,4 +46,9 @@ source_dirs=(
 )
 
 # Run linters
-check_vet ${root_dir} ${source_dirs[@]}
+check_vet ${root_dir} ${source_dirs[@]} >&2
+check_golint ${root_dir} ${source_dirs[@]} >&2
+
+if [[ ${FAILED} > 0 ]]; then
+    exit 1
+fi
