@@ -14,8 +14,8 @@ import (
 	"github.com/anticycle/anticycle/pkg/model"
 )
 
-// ToJson takes list of packages and produces JSON string.
-func ToJson(packages []*model.Pkg) (string, error) {
+// ToJSON takes list of packages and produces JSON string.
+func ToJSON(packages []*model.Pkg) (string, error) {
 	jsonBytes, err := json.Marshal(packages)
 	if err != nil {
 		return "", err
@@ -35,6 +35,7 @@ func isCycle(filePath string, cycles []string) bool {
 	return false
 }
 
+// ToTxt takes list of packages and produces human friendly text output.
 func ToTxt(packages []*model.Pkg) (string, error) {
 	output := make([]string, 0, len(packages))
 	for _, pkg := range packages {

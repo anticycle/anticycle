@@ -35,6 +35,7 @@ type (
 		HaveCycle bool                   `json:"haveCycle"`
 	}
 
+	// Cycle holds information about affected file and import
 	Cycle struct {
 		AffectedImport *ImportInfo `json:"affectedImport"`
 		AffectedFile   string      `json:"affectedFile"`
