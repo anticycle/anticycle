@@ -29,6 +29,14 @@ jobs:
         - darwin/anticycle_amd64
         - windows/anticycle_amd64.exe
 
+  lint:
+    <<: *defaults
+    steps:
+    - checkout
+    - run:
+        name: Run linters
+        command: make lint
+
   unit-tests:
     <<: *defaults
     steps:
@@ -60,6 +68,9 @@ workflows:
         requires:
         - build
     - sanity-tests:
+        requires:
+        - build
+    - lint:
         requires:
         - build
 # TODO (pawelzny): Add job: acceptance-tests with full coverage for CLI
