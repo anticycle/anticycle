@@ -7,12 +7,13 @@ help:
 install: ## build and install project in OS
 	./build/install.sh ./cmd/anticycle
 
-uninstall: ## uninstall project from OS
+uninstall: clean ## uninstall project from OS
 	rm -f $GOPATH/bin/anticycle
 
-clean: clean-build clean-coverage ## remove artifacts
+clean: clean-build ## remove artifacts
+	go clean
 
-build: clean-build ## create artifacts
+build: clean ## create artifacts
 	./build/artifacts.sh ./dist ./cmd/anticycle
 	chmod a+x -R ./dist
 
