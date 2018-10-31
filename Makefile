@@ -1,17 +1,23 @@
 .PHONY: docs test build
 .DEFAULT_GOAL := help
 
+GOPATH ?= `go env GOPATH`
+
 help:
 	@perl -nle'print $& if m{^[a-zA-Z_-]+:.*?## .*$$}' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-25s\033[0m %s\n", $$1, $$2}'
+
+deps: ## install development dependencies
+	./tools/deps.sh install
 
 install: ## build and install project in OS
 	./build/install.sh ./cmd/anticycle
 
 uninstall: clean ## uninstall project from OS
-	rm -f $GOPATH/bin/anticycle
+	rm -f $(GOPATH)/bin/anticycle
 
 clean: clean-build ## remove artifacts
 	go clean
+	./tools/deps.sh uninstall
 
 build: clean ## create artifacts
 	./build/artifacts.sh ./dist ./cmd/anticycle
