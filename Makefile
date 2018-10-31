@@ -49,3 +49,6 @@ benchmark-save: ## save new benchmark as old
 
 format: ## reformat sourcecode
 	go fmt ./...
+
+lint: ## static checks
+	./tools/linter.sh
