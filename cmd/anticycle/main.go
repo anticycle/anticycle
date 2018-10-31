@@ -126,7 +126,7 @@ func main() {
 	trap(err)
 
 	if strings.ToLower(*format) == "json" {
-		output, err = serialize.ToJson(cycles)
+		output, err = serialize.ToJSON(cycles)
 	} else {
 		output, err = serialize.ToTxt(cycles)
 	}

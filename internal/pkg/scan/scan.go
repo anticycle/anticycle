@@ -10,6 +10,8 @@ import (
 	"github.com/anticycle/anticycle/pkg/model"
 )
 
+// FetchPackages walks recursively given directory skipping excluded directories
+// and build list of packages.
 func FetchPackages(dir string, excluded []string) ([]*model.Pkg, error) {
 	packages, err := walkDir(dir, excluded)
 	if err != nil {
@@ -18,6 +20,8 @@ func FetchPackages(dir string, excluded []string) ([]*model.Pkg, error) {
 	return packages, nil
 }
 
+// FindCycles takes list of packages and using Roy-Warshall algorithm
+// marks all cycles between packages.
 func FindCycles(packages []*model.Pkg) ([]*model.Pkg, error) {
 	// 2D array where rows are start nodes and columns are end nodes
 	pkgToInt := make(map[string]int)
