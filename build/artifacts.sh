@@ -5,6 +5,8 @@ version=($("$(dirname "$0")/version.sh"))
 ld=(
     "-X main.version=${version[0]}"
     "-X main.build=${version[1]}"
+    "-s"
+    "-w"
 )
 out=$1
 in=$2
