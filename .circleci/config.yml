@@ -21,6 +21,20 @@ jobs:
     - run:
         name: Build binaries
         command: make build
+    - run:
+        name: Download UPX 3.95
+        command: |
+          wget https://github.com/upx/upx/releases/download/v3.95/upx-3.95-amd64_linux.tar.xz
+          tar -xJf upx-3.95-amd64_linux.tar.xz
+    - run:
+        # UPX support for windows arch amd64 is in experimental stage,
+        # so we don't compress .exe files right now.
+        # Check supported formats at https://en.wikipedia.org/wiki/UPX
+        name: Compress binaries with UPX
+        command: |
+          ./upx-3.95-amd64_linux/upx --brute -q dist/linux/anticycle_amd64 \
+                                                dist/linux/anticycle_arm \
+                                                dist/darwin/anticycle_amd64
     - persist_to_workspace:
         root: dist
         paths:
