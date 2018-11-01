@@ -24,7 +24,7 @@ var DefaultExcluded = []string{
 }
 
 // ExcludeDirs takes list of directories excluded by default and appends directories defined by user.
-// Directories should have only basic names, not a whole path, see example.
+// Directories should have only basic, catalogue names, see example.
 func ExcludeDirs(custom []string) []string {
 	excluded := DefaultExcluded
 	excluded = append(excluded, custom...)

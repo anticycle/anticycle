@@ -8,11 +8,19 @@ dependency cycles. It scans recursively all source files and
 parses theirs dependencies. Anticycle does not compile the code,
 so it is ideal for searching for complex, difficult to debug cycles.
 
-Anticycle consists of three parts.
-1.	main package which exists in cmd/anticycle directory
-	it compiles to binary which can be used within terminal.
-2.	public API which is meant to be import by other applications.
-3.	internal, private functions and structures which should not
-	be imported and use directly. They may change at any moment.
+Anticycle consists of three parts:
+
+1. Main package which exists in cmd/anticycle directory. It compiles to CLI binary
+
+2. Public API which is importable for other applications.
+
+3. Internal, private interface which should not be imported and use directly. It may change at any moment without warnings.
 */
 package anticycle
+
+// Imports for godoc to follow packages
+import (
+	"github.com/anticycle/anticycle/pkg/anticycle"
+	"github.com/anticycle/anticycle/pkg/model"
+	"github.com/anticycle/anticycle/pkg/serialize"
+)

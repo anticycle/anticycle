@@ -1,5 +1,6 @@
 # Anticycle
 
+[![Godoc](https://godoc.org/github.com/anticycle/anticycle?status.svg)](https://godoc.org/github.com/anticycle/anticycle)
 [![CircleCI](https://circleci.com/gh/anticycle/anticycle.svg?style=svg)](https://circleci.com/gh/anticycle/anticycle)
 
 Anticycle is a tool for static code analysis which search for
