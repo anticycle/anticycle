@@ -25,6 +25,18 @@ function check_golint() {
     done
 }
 
+function check_gofmt() {
+    echo "Check: gofmt"
+    make -C $1 format
+    for dir in  "${@:2}"
+    do
+        git diff --exit-code -- "$1$dir"
+        if [[ $? > 0 ]]; then
+            FAILED=1
+        fi
+    done
+}
+
 # Failure flag
 FAILED=0
 
@@ -48,6 +60,7 @@ source_dirs=(
 # Run linters
 check_vet ${root_dir} ${source_dirs[@]} >&2
 check_golint ${root_dir} ${source_dirs[@]} >&2
+check_gofmt ${root_dir} ${source_dirs[@]} >&2
 
 if [[ ${FAILED} > 0 ]]; then
     exit 1
