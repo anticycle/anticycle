@@ -54,16 +54,24 @@ $ anticycle $GOPATH/src/github.com/anticycle/anticycle -all -format=json
 
 ## Development
 
+**Require GO v1.11.x**
+
+Make sure you have GO in version 1.11. If not, [follow official instructions](https://golang.org/doc/install).
+
 ### Download project
 
 ```console
 $ go get github.com/anticycle/anticycle
+$ make deps install
 ```
+
+After each change use `make install` to update dev binary. Then run sanity tests.
+**Sanity tests are called on built binary, not the source code.**
 
 ### Run tests
 
 ```console
-$ make test
+$ make test-all
 ```
 
 ### Build artifacts
