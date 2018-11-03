@@ -17,39 +17,75 @@ func TestFetchPackages(t *testing.T) {
 
 	expected := []*model.Pkg{
 		{
-			Name:    "bar",
-			Path:    "/tmp/anticycle/fetchNoCycle/bar",
-			Imports: map[string]*model.ImportInfo{"fmt": {"fmt", "fmt", nil}},
+			Name: "bar",
+			Path: "/tmp/anticycle/fetchNoCycle/bar",
+			Imports: map[string]*model.ImportInfo{
+				"fmt": {
+					Name:      "fmt",
+					NameShort: "fmt",
+					Alias:     nil,
+				},
+			},
 			Files: []*model.File{
 				{
-					Path:    "/tmp/anticycle/fetchNoCycle/bar/bar.go",
-					Imports: []*model.ImportInfo{{"fmt", "fmt", nil}},
+					Path: "/tmp/anticycle/fetchNoCycle/bar/bar.go",
+					Imports: []*model.ImportInfo{
+						{
+							Name:      "fmt",
+							NameShort: "fmt",
+							Alias:     nil,
+						},
+					},
 				},
 			},
 			Cycles:    []*model.Cycle{},
 			HaveCycle: false,
 		},
 		{
-			Name:    "baz",
-			Path:    "/tmp/anticycle/fetchNoCycle/baz",
-			Imports: map[string]*model.ImportInfo{"/tmp/anticycle/fetchNoCycle/bar": {"/tmp/anticycle/fetchNoCycle/bar", "bar", nil}},
+			Name: "baz",
+			Path: "/tmp/anticycle/fetchNoCycle/baz",
+			Imports: map[string]*model.ImportInfo{
+				"/tmp/anticycle/fetchNoCycle/bar": {
+					Name:      "/tmp/anticycle/fetchNoCycle/bar",
+					NameShort: "bar",
+					Alias:     nil,
+				},
+			},
 			Files: []*model.File{
 				{
-					Path:    "/tmp/anticycle/fetchNoCycle/baz/baz.go",
-					Imports: []*model.ImportInfo{{"/tmp/anticycle/fetchNoCycle/bar", "bar", nil}},
+					Path: "/tmp/anticycle/fetchNoCycle/baz/baz.go",
+					Imports: []*model.ImportInfo{
+						{
+							Name:      "/tmp/anticycle/fetchNoCycle/bar",
+							NameShort: "bar",
+							Alias:     nil,
+						},
+					},
 				},
 			},
 			Cycles:    []*model.Cycle{},
 			HaveCycle: false,
 		},
 		{
-			Name:    "foo",
-			Path:    "/tmp/anticycle/fetchNoCycle/foo",
-			Imports: map[string]*model.ImportInfo{"/tmp/anticycle/fetchNoCycle/bar": {"/tmp/anticycle/fetchNoCycle/bar", "bar", nil}},
+			Name: "foo",
+			Path: "/tmp/anticycle/fetchNoCycle/foo",
+			Imports: map[string]*model.ImportInfo{
+				"/tmp/anticycle/fetchNoCycle/bar": {
+					Name:      "/tmp/anticycle/fetchNoCycle/bar",
+					NameShort: "bar",
+					Alias:     nil,
+				},
+			},
 			Files: []*model.File{
 				{
-					Path:    "/tmp/anticycle/fetchNoCycle/foo/foo.go",
-					Imports: []*model.ImportInfo{{"/tmp/anticycle/fetchNoCycle/bar", "bar", nil}},
+					Path: "/tmp/anticycle/fetchNoCycle/foo/foo.go",
+					Imports: []*model.ImportInfo{
+						{
+							Name:      "/tmp/anticycle/fetchNoCycle/bar",
+							NameShort: "bar",
+							Alias:     nil,
+						},
+					},
 				},
 			},
 			Cycles:    []*model.Cycle{},
@@ -67,13 +103,25 @@ func TestFetchPackages_WithExcludedDir(t *testing.T) {
 
 	expected := []*model.Pkg{
 		{
-			Name:    "bar",
-			Path:    "/tmp/anticycle/fetchExcludedNoCycle/bar",
-			Imports: map[string]*model.ImportInfo{"fmt": {"fmt", "fmt", nil}},
+			Name: "bar",
+			Path: "/tmp/anticycle/fetchExcludedNoCycle/bar",
+			Imports: map[string]*model.ImportInfo{
+				"fmt": {
+					Name:      "fmt",
+					NameShort: "fmt",
+					Alias:     nil,
+				},
+			},
 			Files: []*model.File{
 				{
-					Path:    "/tmp/anticycle/fetchExcludedNoCycle/bar/bar.go",
-					Imports: []*model.ImportInfo{{"fmt", "fmt", nil}},
+					Path: "/tmp/anticycle/fetchExcludedNoCycle/bar/bar.go",
+					Imports: []*model.ImportInfo{
+						{
+							Name:      "fmt",
+							NameShort: "fmt",
+							Alias:     nil,
+						},
+					},
 				},
 			},
 			Cycles:    []*model.Cycle{},
@@ -88,24 +136,48 @@ func TestFetchPackages_WithExcludedDir(t *testing.T) {
 func TestFindCycles_NoCycles(t *testing.T) {
 	packages := []*model.Pkg{
 		{
-			Name:    "bar",
-			Path:    "/tmp/anticycle/fetchNoCycle/bar",
-			Imports: map[string]*model.ImportInfo{"fmt": {"fmt", "fmt", nil}},
+			Name: "bar",
+			Path: "/tmp/anticycle/fetchNoCycle/bar",
+			Imports: map[string]*model.ImportInfo{
+				"fmt": {
+					Name:      "fmt",
+					NameShort: "fmt",
+					Alias:     nil,
+				},
+			},
 			Files: []*model.File{
 				{
-					Path:    "/tmp/anticycle/fetchNoCycle/bar/bar.go",
-					Imports: []*model.ImportInfo{{"fmt", "fmt", nil}},
+					Path: "/tmp/anticycle/fetchNoCycle/bar/bar.go",
+					Imports: []*model.ImportInfo{
+						{
+							Name:      "fmt",
+							NameShort: "fmt",
+							Alias:     nil,
+						},
+					},
 				},
 			},
 		},
 		{
-			Name:    "foo",
-			Path:    "/tmp/anticycle/fetchNoCycle/foo",
-			Imports: map[string]*model.ImportInfo{"/tmp/anticycle/fetchNoCycle/bar": {"/tmp/anticycle/fetchNoCycle/bar", "bar", nil}},
+			Name: "foo",
+			Path: "/tmp/anticycle/fetchNoCycle/foo",
+			Imports: map[string]*model.ImportInfo{
+				"/tmp/anticycle/fetchNoCycle/bar": {
+					Name:      "/tmp/anticycle/fetchNoCycle/bar",
+					NameShort: "bar",
+					Alias:     nil,
+				},
+			},
 			Files: []*model.File{
 				{
-					Path:    "/tmp/anticycle/fetchNoCycle/foo/foo.go",
-					Imports: []*model.ImportInfo{{"/tmp/anticycle/fetchNoCycle/bar", "bar", nil}},
+					Path: "/tmp/anticycle/fetchNoCycle/foo/foo.go",
+					Imports: []*model.ImportInfo{
+						{
+							Name:      "/tmp/anticycle/fetchNoCycle/bar",
+							NameShort: "bar",
+							Alias:     nil,
+						},
+					},
 				},
 			},
 		},
@@ -124,24 +196,48 @@ func TestFindCycles_NoCycles(t *testing.T) {
 func TestFindCycles(t *testing.T) {
 	packages := []*model.Pkg{
 		{
-			Name:    "bar",
-			Path:    "/tmp/anticycle/oneToOne/bar",
-			Imports: map[string]*model.ImportInfo{"/tmp/anticycle/oneToOne/foo": {"/tmp/anticycle/oneToOne/foo", "foo", nil}},
+			Name: "bar",
+			Path: "/tmp/anticycle/oneToOne/bar",
+			Imports: map[string]*model.ImportInfo{
+				"/tmp/anticycle/oneToOne/foo": {
+					Name:      "/tmp/anticycle/oneToOne/foo",
+					NameShort: "foo",
+					Alias:     nil,
+				},
+			},
 			Files: []*model.File{
 				{
-					Path:    "/tmp/anticycle/oneToOne/bar/bar.go",
-					Imports: []*model.ImportInfo{{"/tmp/anticycle/oneToOne/foo", "foo", nil}},
+					Path: "/tmp/anticycle/oneToOne/bar/bar.go",
+					Imports: []*model.ImportInfo{
+						{
+							Name:      "/tmp/anticycle/oneToOne/foo",
+							NameShort: "foo",
+							Alias:     nil,
+						},
+					},
 				},
 			},
 		},
 		{
-			Name:    "foo",
-			Path:    "/tmp/anticycle/oneToOne/foo",
-			Imports: map[string]*model.ImportInfo{"/tmp/anticycle/oneToOne/bar": {"/tmp/anticycle/oneToOne/bar", "bar", nil}},
+			Name: "foo",
+			Path: "/tmp/anticycle/oneToOne/foo",
+			Imports: map[string]*model.ImportInfo{
+				"/tmp/anticycle/oneToOne/bar": {
+					Name:      "/tmp/anticycle/oneToOne/bar",
+					NameShort: "bar",
+					Alias:     nil,
+				},
+			},
 			Files: []*model.File{
 				{
-					Path:    "/tmp/anticycle/oneToOne/foo/foo.go",
-					Imports: []*model.ImportInfo{{"/tmp/anticycle/oneToOne/bar", "bar", nil}},
+					Path: "/tmp/anticycle/oneToOne/foo/foo.go",
+					Imports: []*model.ImportInfo{
+						{
+							Name:      "/tmp/anticycle/oneToOne/bar",
+							NameShort: "bar",
+							Alias:     nil,
+						},
+					},
 				},
 			},
 		},
@@ -160,24 +256,48 @@ func TestFindCycles(t *testing.T) {
 func TestFindCycles_FalsePositiveExternalPkgNameOverlap(t *testing.T) {
 	packages := []*model.Pkg{
 		{
-			Name:    "foo",
-			Path:    "/tmp/anticycle/falsePositive/foo",
-			Imports: map[string]*model.ImportInfo{"/tmp/anticycle/falsePositive/bar": {"/tmp/anticycle/falsePositive/bar", "bar", nil}},
+			Name: "foo",
+			Path: "/tmp/anticycle/falsePositive/foo",
+			Imports: map[string]*model.ImportInfo{
+				"/tmp/anticycle/falsePositive/bar": {
+					Name:      "/tmp/anticycle/falsePositive/bar",
+					NameShort: "bar",
+					Alias:     nil,
+				},
+			},
 			Files: []*model.File{
 				{
-					Path:    "/tmp/anticycle/falsePositive/foo/foo.go",
-					Imports: []*model.ImportInfo{{"/tmp/anticycle/falsePositive/bar", "bar", nil}},
+					Path: "/tmp/anticycle/falsePositive/foo/foo.go",
+					Imports: []*model.ImportInfo{
+						{
+							Name:      "/tmp/anticycle/falsePositive/bar",
+							NameShort: "bar",
+							Alias:     nil,
+						},
+					},
 				},
 			},
 		},
 		{
-			Name:    "bar",
-			Path:    "/tmp/anticycle/falsePositive/bar",
-			Imports: map[string]*model.ImportInfo{"github.com/external/fake/foo": {"github.com/external/fake/foo", "foo", nil}},
+			Name: "bar",
+			Path: "/tmp/anticycle/falsePositive/bar",
+			Imports: map[string]*model.ImportInfo{
+				"github.com/external/fake/foo": {
+					Name:      "github.com/external/fake/foo",
+					NameShort: "foo",
+					Alias:     nil,
+				},
+			},
 			Files: []*model.File{
 				{
-					Path:    "/tmp/anticycle/falsePositive/bar/bar.go",
-					Imports: []*model.ImportInfo{{"github.com/external/fake/foo", "foo", nil}},
+					Path: "/tmp/anticycle/falsePositive/bar/bar.go",
+					Imports: []*model.ImportInfo{
+						{
+							Name:      "github.com/external/fake/foo",
+							NameShort: "foo",
+							Alias:     nil,
+						},
+					},
 				},
 			},
 		},
