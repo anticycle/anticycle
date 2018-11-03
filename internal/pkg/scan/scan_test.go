@@ -32,11 +32,11 @@ func TestFetchPackages(t *testing.T) {
 		{
 			Name:    "baz",
 			Path:    "/tmp/anticycle/fetchNoCycle/baz",
-			Imports: map[string]*model.ImportInfo{"bar/bar": {"bar/bar", "bar", nil}},
+			Imports: map[string]*model.ImportInfo{"/tmp/anticycle/fetchNoCycle/bar": {"/tmp/anticycle/fetchNoCycle/bar", "bar", nil}},
 			Files: []*model.File{
 				{
 					Path:    "/tmp/anticycle/fetchNoCycle/baz/baz.go",
-					Imports: []*model.ImportInfo{{"bar/bar", "bar", nil}},
+					Imports: []*model.ImportInfo{{"/tmp/anticycle/fetchNoCycle/bar", "bar", nil}},
 				},
 			},
 			Cycles:    []*model.Cycle{},
@@ -45,11 +45,11 @@ func TestFetchPackages(t *testing.T) {
 		{
 			Name:    "foo",
 			Path:    "/tmp/anticycle/fetchNoCycle/foo",
-			Imports: map[string]*model.ImportInfo{"bar/bar": {"bar/bar", "bar", nil}},
+			Imports: map[string]*model.ImportInfo{"/tmp/anticycle/fetchNoCycle/bar": {"/tmp/anticycle/fetchNoCycle/bar", "bar", nil}},
 			Files: []*model.File{
 				{
 					Path:    "/tmp/anticycle/fetchNoCycle/foo/foo.go",
-					Imports: []*model.ImportInfo{{"bar/bar", "bar", nil}},
+					Imports: []*model.ImportInfo{{"/tmp/anticycle/fetchNoCycle/bar", "bar", nil}},
 				},
 			},
 			Cycles:    []*model.Cycle{},
@@ -101,11 +101,11 @@ func TestFindCycles_NoCycles(t *testing.T) {
 		{
 			Name:    "foo",
 			Path:    "/tmp/anticycle/fetchNoCycle/foo",
-			Imports: map[string]*model.ImportInfo{"bar/bar": {"bar/bar", "bar", nil}},
+			Imports: map[string]*model.ImportInfo{"/tmp/anticycle/fetchNoCycle/bar": {"/tmp/anticycle/fetchNoCycle/bar", "bar", nil}},
 			Files: []*model.File{
 				{
 					Path:    "/tmp/anticycle/fetchNoCycle/foo/foo.go",
-					Imports: []*model.ImportInfo{{"bar/bar", "bar", nil}},
+					Imports: []*model.ImportInfo{{"/tmp/anticycle/fetchNoCycle/bar", "bar", nil}},
 				},
 			},
 		},
@@ -125,34 +125,23 @@ func TestFindCycles(t *testing.T) {
 	packages := []*model.Pkg{
 		{
 			Name:    "bar",
-			Path:    "/tmp/anticycle/fetchNoCycle/bar",
-			Imports: map[string]*model.ImportInfo{"foo/foo": {"foo/foo", "foo", nil}},
+			Path:    "/tmp/anticycle/oneToOne/bar",
+			Imports: map[string]*model.ImportInfo{"/tmp/anticycle/oneToOne/foo": {"/tmp/anticycle/oneToOne/foo", "foo", nil}},
 			Files: []*model.File{
 				{
-					Path:    "/tmp/anticycle/fetchNoCycle/bar/bar.go",
-					Imports: []*model.ImportInfo{{"foo/foo", "foo", nil}},
-				},
-			},
-		},
-		{
-			Name:    "baz",
-			Path:    "/tmp/anticycle/fetchNoCycle/baz",
-			Imports: map[string]*model.ImportInfo{"foo/foo": {"foo/foo", "foo", nil}},
-			Files: []*model.File{
-				{
-					Path:    "/tmp/anticycle/fetchNoCycle/baz/baz.go",
-					Imports: []*model.ImportInfo{{"foo/foo", "foo", nil}},
+					Path:    "/tmp/anticycle/oneToOne/bar/bar.go",
+					Imports: []*model.ImportInfo{{"/tmp/anticycle/oneToOne/foo", "foo", nil}},
 				},
 			},
 		},
 		{
 			Name:    "foo",
-			Path:    "/tmp/anticycle/fetchNoCycle/foo",
-			Imports: map[string]*model.ImportInfo{"bar/bar": {"bar/bar", "bar", nil}},
+			Path:    "/tmp/anticycle/oneToOne/foo",
+			Imports: map[string]*model.ImportInfo{"/tmp/anticycle/oneToOne/bar": {"/tmp/anticycle/oneToOne/bar", "bar", nil}},
 			Files: []*model.File{
 				{
-					Path:    "/tmp/anticycle/fetchNoCycle/foo/foo.go",
-					Imports: []*model.ImportInfo{{"bar/bar", "bar", nil}},
+					Path:    "/tmp/anticycle/oneToOne/foo/foo.go",
+					Imports: []*model.ImportInfo{{"/tmp/anticycle/oneToOne/bar", "bar", nil}},
 				},
 			},
 		},
@@ -160,7 +149,43 @@ func TestFindCycles(t *testing.T) {
 	cycles, err := FindCycles(packages)
 	assert.NoError(t, err)
 
-	expected := []bool{true, false, true}
+	expected := []bool{true, true}
+	result := make([]bool, 0)
+	for _, cycle := range cycles {
+		result = append(result, cycle.HaveCycle)
+	}
+	assert.EqualValues(t, expected, result)
+}
+
+func TestFindCycles_FalsePositiveExternalPkgNameOverlap(t *testing.T) {
+	packages := []*model.Pkg{
+		{
+			Name:    "foo",
+			Path:    "/tmp/anticycle/falsePositive/foo",
+			Imports: map[string]*model.ImportInfo{"/tmp/anticycle/falsePositive/bar": {"/tmp/anticycle/falsePositive/bar", "bar", nil}},
+			Files: []*model.File{
+				{
+					Path:    "/tmp/anticycle/falsePositive/foo/foo.go",
+					Imports: []*model.ImportInfo{{"/tmp/anticycle/falsePositive/bar", "bar", nil}},
+				},
+			},
+		},
+		{
+			Name:    "bar",
+			Path:    "/tmp/anticycle/falsePositive/bar",
+			Imports: map[string]*model.ImportInfo{"github.com/external/fake/foo": {"github.com/external/fake/foo", "foo", nil}},
+			Files: []*model.File{
+				{
+					Path:    "/tmp/anticycle/falsePositive/bar/bar.go",
+					Imports: []*model.ImportInfo{{"github.com/external/fake/foo", "foo", nil}},
+				},
+			},
+		},
+	}
+	cycles, err := FindCycles(packages)
+	assert.NoError(t, err)
+
+	expected := []bool{false, false}
 	result := make([]bool, 0)
 	for _, cycle := range cycles {
 		result = append(result, cycle.HaveCycle)

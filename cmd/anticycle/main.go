@@ -125,7 +125,7 @@ func main() {
 	cycles, err := anticycle.Analyze(dir, excluded, *all)
 	trap(err)
 
-	if strings.ToLower(*format) == "json" {
+	if strings.EqualFold(*format, "json") {
 		output, err = serialize.ToJSON(cycles)
 	} else {
 		output, err = serialize.ToTxt(cycles)

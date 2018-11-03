@@ -53,9 +53,9 @@ func tmpFile(dir, filename, data string) (*os.File, error) {
 func makeProjectNoCycles(testName string) (string, func()) {
 	dir, remove := tmpDir(testName)
 	packages := []struct{ Name, Data string }{
-		{"foo", "package foo\nimport \"bar/bar\""},
+		{"foo", fmt.Sprintf("package foo\nimport \"/tmp/anticycle/%v/bar\"", testName)},
 		{"bar", "package bar\nimport \"fmt\""},
-		{"baz", "package baz\nimport \"bar/bar\""},
+		{"baz", fmt.Sprintf("package baz\nimport \"/tmp/anticycle/%v/bar\"", testName)},
 	}
 
 	if err := _generateProject(dir, packages); err != nil {
@@ -71,8 +71,8 @@ func makeProjectOneToOne(testName string) (string, func()) {
 	dir, remove := tmpDir(testName)
 	packages := []struct{ Name, Data string }{
 		{"foo", "package foo"},
-		{"bar", "package bar\nimport \"baz/baz\""},
-		{"baz", "package baz\nimport \"bar/bar\""},
+		{"bar", fmt.Sprintf("package bar\nimport \"/tmp/anticycle/%v/baz\"", testName)},
+		{"baz", fmt.Sprintf("package baz\nimport \"/tmp/anticycle/%v/bar\"", testName)},
 	}
 
 	if err := _generateProject(dir, packages); err != nil {
@@ -87,9 +87,9 @@ func makeProjectOneToOne(testName string) (string, func()) {
 func makeProjectTriangle(testName string) (string, func()) {
 	dir, remove := tmpDir(testName)
 	packages := []struct{ Name, Data string }{
-		{"foo", "package foo\nimport \"baz/baz\""},
-		{"bar", "package bar\nimport \"foo/foo\""},
-		{"baz", "package baz\nimport \"bar/bar\""},
+		{"foo", fmt.Sprintf("package foo\nimport \"/tmp/anticycle/%v/baz\"", testName)},
+		{"bar", fmt.Sprintf("package bar\nimport \"/tmp/anticycle/%v/foo\"", testName)},
+		{"baz", fmt.Sprintf("package baz\nimport \"/tmp/anticycle/%v/bar\"", testName)},
 	}
 
 	if err := _generateProject(dir, packages); err != nil {
@@ -104,10 +104,10 @@ func makeProjectTriangle(testName string) (string, func()) {
 func makeProjectDiagonalSquare(testName string) (string, func()) {
 	dir, remove := tmpDir(testName)
 	packages := []struct{ Name, Data string }{
-		{"foo", "package foo\nimport \"pas/pas\""},
-		{"bar", "package bar\nimport \"foo/foo\""},
-		{"baz", "package baz\nimport \"bar/bar\""},
-		{"pas", "package pas\nimport \"baz/baz\""},
+		{"foo", fmt.Sprintf("package foo\nimport \"/tmp/anticycle/%v/pas\"", testName)},
+		{"bar", fmt.Sprintf("package bar\nimport \"/tmp/anticycle/%v/foo\"", testName)},
+		{"baz", fmt.Sprintf("package baz\nimport \"/tmp/anticycle/%v/bar\"", testName)},
+		{"pas", fmt.Sprintf("package pas\nimport \"/tmp/anticycle/%v/baz\"", testName)},
 	}
 
 	if err := _generateProject(dir, packages); err != nil {

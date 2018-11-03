@@ -86,7 +86,6 @@ func TestShowAllPackages(t *testing.T) {
 }
 
 func TestFalsePositiveExternalPackage(t *testing.T) {
-	t.Skip("Skip until issue #10 is not resolved")
 	cmd := exec.Command("anticycle", "./testdata/externalFalsePositive")
 	stdoutStderr, err := cmd.CombinedOutput()
 	assert.NoError(t, err)

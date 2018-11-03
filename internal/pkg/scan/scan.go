@@ -39,7 +39,8 @@ func FindCycles(packages []*model.Pkg) ([]*model.Pkg, error) {
 	// fill graph with nodes
 	for idx, pkg := range packages {
 		for _, imp := range pkg.Imports {
-			if impIdx, ok := pkgToInt[imp.NameShort]; ok {
+			impIdx, ok := pkgToInt[imp.NameShort]
+			if ok && strings.Contains(imp.Name, packages[impIdx].Path) {
 				graph[idx][impIdx] = 1
 			}
 		}
