@@ -95,15 +95,27 @@ workflows:
   build-test-release:
     jobs:
     - build
+        filters:
+          tags:
+            only: /.*/
     - unit-tests:
         requires:
         - build
+        filters:
+          tags:
+            only: /.*/
     - lint:
         requires:
         - build
+        filters:
+          tags:
+            only: /.*/
     - sanity-tests:
         requires:
         - build
+        filters:
+          tags:
+            only: /.*/
 # TODO (pawelzny): Add job: acceptance-tests with full coverage for CLI
 #    - acceptance-tests:
 #        requires:
