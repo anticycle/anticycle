@@ -13,6 +13,12 @@ defaults: &defaults
   ####   /go/src/bitbucket.org/circleci/go-tool
   working_directory: /go/src/github.com/anticycle/anticycle
 
+releasing: &releasing
+  docker:
+  - image: cibuilds/github:0.10
+
+  working_directory: /go/src/github.com/anticycle/anticycle
+
 jobs:
   build:
     <<: *defaults
@@ -73,10 +79,9 @@ jobs:
         command: make test-sanity
 
   release:
-    <<: *defaults
-    docker:
-    - image: cibuilds/github:0.10
+    <<: *releasing
     steps:
+    - checkout
     - attach_workspace:
         at: /tmp/artifacts
     - run:
