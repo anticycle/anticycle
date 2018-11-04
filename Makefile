@@ -21,10 +21,13 @@ clean: clean-build ## remove artifacts
 
 build: clean ## create artifacts
 	./build/artifacts.sh ./dist ./cmd/anticycle
-	chmod a+x -R ./dist
 
 clean-build: ## remove linker artifacts
-	rm -rf ./dist/*
+	rm -rf ./dist/
+
+tarball: ## create tar.gz files
+	rm -rf ./dist/release
+	./build/tarball.sh ./dist
 
 test: ## run tests
 	go test -race -v ./pkg/...
