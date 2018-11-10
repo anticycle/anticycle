@@ -182,35 +182,89 @@ func TestFindCycles_NoCycles(t *testing.T) {
 			},
 		},
 	}
+	expected := []struct{ files, imports, cycles int }{
+		{files: 1, imports: 1, cycles: 0},
+		{files: 1, imports: 1, cycles: 0},
+	}
+
 	cycles, err := FindCycles(packages)
 	assert.NoError(t, err)
 
-	expected := []bool{false, false}
-	result := make([]bool, 0)
-	for _, cycle := range cycles {
-		result = append(result, cycle.HaveCycle)
+	for i, cycle := range cycles {
+		t.Run(cycle.Name, func(t *testing.T) {
+			assert.Len(t, cycle.Files, expected[i].files)
+			assert.Len(t, cycle.Imports, expected[i].imports)
+			assert.Len(t, cycle.Cycles, expected[i].cycles)
+		})
 	}
-	assert.EqualValues(t, expected, result)
 }
 
 func TestFindCycles(t *testing.T) {
 	packages := []*model.Pkg{
 		{
 			Name: "bar",
-			Path: "/tmp/anticycle/oneToOne/bar",
+			Path: "/tmp/anticycle/skipNotAffected/bar",
 			Imports: map[string]*model.ImportInfo{
-				"/tmp/anticycle/oneToOne/foo": {
-					Name:      "/tmp/anticycle/oneToOne/foo",
+				"/tmp/anticycle/skipNotAffected/baz": {
+					Name:      "/tmp/anticycle/skipNotAffected/baz",
+					NameShort: "baz",
+					Alias:     nil,
+				},
+				"/tmp/anticycle/skipNotAffected/foo": {
+					Name:      "/tmp/anticycle/skipNotAffected/foo",
 					NameShort: "foo",
 					Alias:     nil,
 				},
 			},
 			Files: []*model.File{
 				{
-					Path: "/tmp/anticycle/oneToOne/bar/bar.go",
+					Path: "/tmp/anticycle/skipNotAffected/bar/bar.go",
 					Imports: []*model.ImportInfo{
 						{
-							Name:      "/tmp/anticycle/oneToOne/foo",
+							Name:      "/tmp/anticycle/skipNotAffected/baz",
+							NameShort: "baz",
+							Alias:     nil,
+						},
+					},
+				},
+				{
+					Path: "/tmp/anticycle/skipNotAffected/bar/clean.go",
+					Imports: []*model.ImportInfo{
+						{
+							Name:      "/tmp/anticycle/skipNotAffected/foo",
+							NameShort: "baz",
+							Alias:     nil,
+						},
+					},
+				},
+			},
+		},
+		{
+			Name: "baz",
+			Path: "/tmp/anticycle/skipNotAffected/baz",
+			Imports: map[string]*model.ImportInfo{
+				"/tmp/anticycle/skipNotAffected/bar": {
+					Name:      "/tmp/anticycle/skipNotAffected/bar",
+					NameShort: "bar",
+					Alias:     nil,
+				},
+				"/tmp/anticycle/skipNotAffected/foo": {
+					Name:      "/tmp/anticycle/skipNotAffected/foo",
+					NameShort: "foo",
+					Alias:     nil,
+				},
+			},
+			Files: []*model.File{
+				{
+					Path: "/tmp/anticycle/skipNotAffected/baz/baz.go",
+					Imports: []*model.ImportInfo{
+						{
+							Name:      "/tmp/anticycle/skipNotAffected/bar",
+							NameShort: "bar",
+							Alias:     nil,
+						},
+						{
+							Name:      "/tmp/anticycle/skipNotAffected/foo",
 							NameShort: "foo",
 							Alias:     nil,
 						},
@@ -220,37 +274,30 @@ func TestFindCycles(t *testing.T) {
 		},
 		{
 			Name: "foo",
-			Path: "/tmp/anticycle/oneToOne/foo",
-			Imports: map[string]*model.ImportInfo{
-				"/tmp/anticycle/oneToOne/bar": {
-					Name:      "/tmp/anticycle/oneToOne/bar",
-					NameShort: "bar",
-					Alias:     nil,
-				},
-			},
+			Path: "/tmp/anticycle/skipNotAffected/foo",
 			Files: []*model.File{
 				{
-					Path: "/tmp/anticycle/oneToOne/foo/foo.go",
-					Imports: []*model.ImportInfo{
-						{
-							Name:      "/tmp/anticycle/oneToOne/bar",
-							NameShort: "bar",
-							Alias:     nil,
-						},
-					},
+					Path: "/tmp/anticycle/skipNotAffected/foo/foo.go",
 				},
 			},
 		},
 	}
+	expected := []struct{ files, imports, cycles int }{
+		{files: 2, imports: 2, cycles: 1},
+		{files: 1, imports: 2, cycles: 1},
+		{files: 1, imports: 0, cycles: 0},
+	}
+
 	cycles, err := FindCycles(packages)
 	assert.NoError(t, err)
 
-	expected := []bool{true, true}
-	result := make([]bool, 0)
-	for _, cycle := range cycles {
-		result = append(result, cycle.HaveCycle)
+	for i, cycle := range cycles {
+		t.Run(cycle.Name, func(t *testing.T) {
+			assert.Len(t, cycle.Files, expected[i].files)
+			assert.Len(t, cycle.Imports, expected[i].imports)
+			assert.Len(t, cycle.Cycles, expected[i].cycles)
+		})
 	}
-	assert.EqualValues(t, expected, result)
 }
 
 func TestFindCycles_FalsePositiveExternalPkgNameOverlap(t *testing.T) {
@@ -302,15 +349,20 @@ func TestFindCycles_FalsePositiveExternalPkgNameOverlap(t *testing.T) {
 			},
 		},
 	}
+	expected := []struct{ files, imports, cycles int }{
+		{files: 1, imports: 1, cycles: 0},
+		{files: 1, imports: 1, cycles: 0},
+	}
 	cycles, err := FindCycles(packages)
 	assert.NoError(t, err)
 
-	expected := []bool{false, false}
-	result := make([]bool, 0)
-	for _, cycle := range cycles {
-		result = append(result, cycle.HaveCycle)
+	for i, cycle := range cycles {
+		t.Run(cycle.Name, func(t *testing.T) {
+			assert.Len(t, cycle.Files, expected[i].files)
+			assert.Len(t, cycle.Imports, expected[i].imports)
+			assert.Len(t, cycle.Cycles, expected[i].cycles)
+		})
 	}
-	assert.EqualValues(t, expected, result)
 }
 
 func BenchmarkFindCycles_NoCycles(b *testing.B) {

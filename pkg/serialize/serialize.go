@@ -8,7 +8,6 @@ package serialize
 import (
 	"encoding/json"
 	"fmt"
-	"sort"
 	"strings"
 
 	"github.com/anticycle/anticycle/pkg/model"
@@ -27,33 +26,26 @@ func ToJSON(packages []*model.Pkg) (string, error) {
 	return output, nil
 }
 
-func isCycle(filePath string, cycles []string) bool {
-	i := sort.SearchStrings(cycles, filePath)
-	if i < len(cycles) && cycles[i] == filePath {
-		return true
-	}
-	return false
-}
-
 // ToTxt takes list of packages and produces human friendly text output.
 func ToTxt(packages []*model.Pkg) (string, error) {
 	output := make([]string, 0, len(packages))
 	for _, pkg := range packages {
 		fOutput := make([]string, 0)
-		cycles := make([]string, 0, len(pkg.Cycles))
+		cycles := make(map[string]bool, len(pkg.Cycles))
 		if pkg.HaveCycle == true {
 			for _, cycle := range pkg.Cycles {
-				cycles = append(cycles, cycle.AffectedFile)
+				cycles[cycle.AffectedImport.Name] = true
 			}
-			sort.Strings(cycles)
 		}
 
 		for _, file := range pkg.Files {
 			fOutput = append(fOutput, fmt.Sprintf("  %v", file.Path))
 			for _, imp := range file.Imports {
-				format := "    \"%v\""
-				if isCycle(file.Path, cycles) == true {
+				var format string
+				if _, ok := cycles[imp.Name]; ok {
 					format = "    C \"%v\""
+				} else {
+					format = "      \"%v\""
 				}
 				fOutput = append(fOutput, fmt.Sprintf(format, imp.Name))
 			}

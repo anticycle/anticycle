@@ -12,10 +12,10 @@ devdeps: ## install development dependencies
 clean-devdeps: ## uninstall development dependencies
 	./tools/devdeps.sh uninstall
 
-install: ## build and install project in $GOPATH/bin/
+install: uninstall ## build and install project in $GOPATH/bin/
 	./build/install.sh ./cmd/anticycle
 
-uninstall: clean ## uninstall project from $GOPATH/bin/
+uninstall: ## uninstall project from $GOPATH/bin/
 	rm -f $(GOPATH)/bin/anticycle
 
 clean: clean-build ## remove artifacts

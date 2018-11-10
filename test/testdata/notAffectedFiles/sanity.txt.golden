@@ -1,0 +1,8 @@
+bar
+  testdata/notAffectedFiles/bar/bar.go
+    C "testdata/notAffectedFiles/baz"
+
+baz
+  testdata/notAffectedFiles/baz/baz.go
+    C "testdata/notAffectedFiles/bar"
+

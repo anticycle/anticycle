@@ -46,3 +46,115 @@ func ExampleToJSON() {
 	fmt.Print(jsonStr)
 	// Output: [{"name":"test/pkg","path":"","imports":{"internal":null},"files":[],"haveCycle":false}]
 }
+
+func TestToTxt(t *testing.T) {
+	packages := []*model.Pkg{
+		{
+			Name: "bar",
+			Path: "/tmp/anticycle/skipNotAffected/bar",
+			Imports: map[string]*model.ImportInfo{
+				"/tmp/anticycle/skipNotAffected/baz": {
+					Name:      "/tmp/anticycle/skipNotAffected/baz",
+					NameShort: "baz",
+					Alias:     nil,
+				},
+				"/tmp/anticycle/skipNotAffected/foo": {
+					Name:      "/tmp/anticycle/skipNotAffected/foo",
+					NameShort: "foo",
+					Alias:     nil,
+				},
+			},
+			Files: []*model.File{
+				{
+					Path: "/tmp/anticycle/skipNotAffected/bar/bar.go",
+					Imports: []*model.ImportInfo{
+						{
+							Name:      "/tmp/anticycle/skipNotAffected/baz",
+							NameShort: "baz",
+							Alias:     nil,
+						},
+					},
+				},
+				{
+					Path: "/tmp/anticycle/skipNotAffected/bar/clean.go",
+					Imports: []*model.ImportInfo{
+						{
+							Name:      "/tmp/anticycle/skipNotAffected/foo",
+							NameShort: "foo",
+							Alias:     nil,
+						},
+					},
+				},
+			},
+			HaveCycle: true,
+			Cycles: []*model.Cycle{
+				{
+					AffectedFile: "/tmp/anticycle/skipNotAffected/bar/bar.go",
+					AffectedImport: &model.ImportInfo{
+						Name:      "/tmp/anticycle/skipNotAffected/baz",
+						NameShort: "baz",
+						Alias:     nil,
+					},
+				},
+			},
+		},
+		{
+			Name: "baz",
+			Path: "/tmp/anticycle/skipNotAffected/baz",
+			Imports: map[string]*model.ImportInfo{
+				"/tmp/anticycle/skipNotAffected/bar": {
+					Name:      "/tmp/anticycle/skipNotAffected/bar",
+					NameShort: "bar",
+					Alias:     nil,
+				},
+				"/tmp/anticycle/skipNotAffected/foo": {
+					Name:      "/tmp/anticycle/skipNotAffected/foo",
+					NameShort: "foo",
+					Alias:     nil,
+				},
+			},
+			Files: []*model.File{
+				{
+					Path: "/tmp/anticycle/skipNotAffected/baz/baz.go",
+					Imports: []*model.ImportInfo{
+						{
+							Name:      "/tmp/anticycle/skipNotAffected/bar",
+							NameShort: "bar",
+							Alias:     nil,
+						},
+						{
+							Name:      "/tmp/anticycle/skipNotAffected/foo",
+							NameShort: "foo",
+							Alias:     nil,
+						},
+					},
+				},
+			},
+			HaveCycle: true,
+			Cycles: []*model.Cycle{
+				{
+					AffectedFile: "/tmp/anticycle/skipNotAffected/baz/baz.go",
+					AffectedImport: &model.ImportInfo{
+						Name:      "/tmp/anticycle/skipNotAffected/bar",
+						NameShort: "bar",
+						Alias:     nil,
+					},
+				},
+			},
+		},
+		{
+			Name: "foo",
+			Path: "/tmp/anticycle/skipNotAffected/foo",
+			Files: []*model.File{
+				{
+					Path: "/tmp/anticycle/skipNotAffected/foo/foo.go",
+				},
+			},
+		},
+	}
+	expected := "bar\n  /tmp/anticycle/skipNotAffected/bar/bar.go\n    C \"/tmp/anticycle/skipNotAffected/baz\"\n  /tmp/anticycle/skipNotAffected/bar/clean.go\n      \"/tmp/anticycle/skipNotAffected/foo\"\n\nbaz\n  /tmp/anticycle/skipNotAffected/baz/baz.go\n    C \"/tmp/anticycle/skipNotAffected/bar\"\n      \"/tmp/anticycle/skipNotAffected/foo\"\n\nfoo\n  /tmp/anticycle/skipNotAffected/foo/foo.go\n"
+
+	result, err := ToTxt(packages)
+	assert.NoError(t, err)
+	assert.Equal(t, expected, result)
+}

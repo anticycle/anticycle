@@ -1,6 +1,7 @@
 package test
 
 import (
+	"encoding/json"
 	"flag"
 	"fmt"
 	"io/ioutil"
@@ -10,6 +11,7 @@ import (
 	"testing"
 
 	"github.com/anticycle/anticycle/pkg/anticycle"
+	"github.com/anticycle/anticycle/pkg/model"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -29,58 +31,96 @@ func TestNoCycle(t *testing.T) {
 	assert.Equal(t, "", string(stdoutStderr))
 }
 
-func TestShowAllPackages(t *testing.T) {
-	cases := []struct {
-		Name, Golden string
-		Args         []string
+func TestAnticycle(t *testing.T) {
+	tests := []struct {
+		isJSON       bool
+		name, golden string
+		args         []string
 	}{
 		// no go file in directory scenario
 		{
-			Name:   "No GO files in directory, output all as text",
-			Args:   []string{"-all", "-format=text", "./testdata/empty"},
-			Golden: filepath.Join("testdata", "empty", "sanity.txt.golden"),
+			name:   "No GO files in directory, output all as text",
+			args:   []string{"-all", "-format=text", "./testdata/empty"},
+			golden: filepath.Join("testdata", "empty", "sanity-all.txt.golden"),
 		},
 		{
-			Name:   "No GO files in directory, output all as JSON",
-			Args:   []string{"-all", "-format=json", "./testdata/empty"},
-			Golden: filepath.Join("testdata", "empty", "sanity.json.golden"),
+			isJSON: true,
+			name:   "No GO files in directory, output all as JSON",
+			args:   []string{"-all", "-format=json", "./testdata/empty"},
+			golden: filepath.Join("testdata", "empty", "sanity-all.json.golden"),
 		},
 
 		// no cycles scenario
 		{
-			Name:   "No cycles, output all as text",
-			Args:   []string{"-all", "-format=text", "./testdata/nocycle"},
-			Golden: filepath.Join("testdata", "nocycle", "sanity.txt.golden"),
+			name:   "No cycles, output all as text",
+			args:   []string{"-all", "-format=text", "./testdata/nocycle"},
+			golden: filepath.Join("testdata", "nocycle", "sanity-all.txt.golden"),
 		},
 		{
-			Name:   "No cycles, output all as JSON",
-			Args:   []string{"-all", "-format=json", "./testdata/nocycle"},
-			Golden: filepath.Join("testdata", "nocycle", "sanity.json.golden"),
+			isJSON: true,
+			name:   "No cycles, output all as JSON",
+			args:   []string{"-all", "-format=json", "./testdata/nocycle"},
+			golden: filepath.Join("testdata", "nocycle", "sanity-all.json.golden"),
 		},
 
 		// one-to-one cycle scenario
 		{
-			Name:   "One-to-one cycle, output all as text",
-			Args:   []string{"-all", "-format=text", "./testdata/onetoone"},
-			Golden: filepath.Join("testdata", "onetoone", "sanity.txt.golden"),
+			name:   "One-to-one cycle, output all as text",
+			args:   []string{"-all", "-format=text", "./testdata/onetoone"},
+			golden: filepath.Join("testdata", "onetoone", "sanity-all.txt.golden"),
 		},
 		{
-			Name:   "One-to-one cycle, output all as JSON",
-			Args:   []string{"-all", "-format=json", "./testdata/onetoone"},
-			Golden: filepath.Join("testdata", "onetoone", "sanity.json.golden"),
+			name:   "One-to-one cycle, output as text",
+			args:   []string{"-format=text", "./testdata/onetoone"},
+			golden: filepath.Join("testdata", "onetoone", "sanity.txt.golden"),
+		},
+
+		{
+			isJSON: true,
+			name:   "One-to-one cycle, output all as JSON",
+			args:   []string{"-all", "-format=json", "./testdata/onetoone"},
+			golden: filepath.Join("testdata", "onetoone", "sanity-all.json.golden"),
+		},
+		{
+			isJSON: true,
+			name:   "One-to-one cycle, output as JSON",
+			args:   []string{"-format=json", "./testdata/onetoone"},
+			golden: filepath.Join("testdata", "onetoone", "sanity.json.golden"),
+		},
+
+		// not-affected-files cycle scenario
+		{
+			name:   "Not-affected-files cycle, output as text",
+			args:   []string{"-format=text", "./testdata/notAffectedFiles"},
+			golden: filepath.Join("testdata", "notAffectedFiles", "sanity.txt.golden"),
+		},
+		{
+			isJSON: true,
+			name:   "Not-affected-files cycle, output as JSON",
+			args:   []string{"-format=json", "./testdata/notAffectedFiles"},
+			golden: filepath.Join("testdata", "notAffectedFiles", "sanity.json.golden"),
 		},
 	}
 
-	for _, c := range cases {
-		t.Run(c.Name, func(t *testing.T) {
-			cmd := exec.Command("anticycle", c.Args...)
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			cmd := exec.Command("anticycle", test.args...)
 			stdoutStderr, err := cmd.CombinedOutput()
 			assert.NoError(t, err)
 			if *update {
-				ioutil.WriteFile(c.Golden, stdoutStderr, 0644)
+				ioutil.WriteFile(test.golden, stdoutStderr, 0644)
 			}
-			expected, _ := ioutil.ReadFile(c.Golden)
-			assert.Equal(t, expected, stdoutStderr)
+			if test.isJSON {
+				var expected, result []model.Pkg
+				golden, _ := ioutil.ReadFile(test.golden)
+				json.Unmarshal(stdoutStderr, &result)
+				json.Unmarshal(golden, &expected)
+
+				assert.EqualValues(t, expected, result)
+			} else {
+				expected, _ := ioutil.ReadFile(test.golden)
+				assert.Equal(t, expected, stdoutStderr)
+			}
 		})
 	}
 }

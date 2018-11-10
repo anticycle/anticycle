@@ -1,10 +1,10 @@
 bar
   testdata/nocycle/bar/bar.go
-    "testdata/nocycle/foo"
+      "testdata/nocycle/foo"
 
 baz
   testdata/nocycle/baz/baz.go
-    "testdata/nocycle/foo"
+      "testdata/nocycle/foo"
 
 foo
   testdata/nocycle/foo/foo.go

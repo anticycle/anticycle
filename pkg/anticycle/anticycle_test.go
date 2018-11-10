@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"testing"
 
+	"github.com/anticycle/anticycle/pkg/model"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -29,4 +30,122 @@ func ExampleExcludeDirs() {
 	excluded := ExcludeDirs(custom)
 	fmt.Print(excluded)
 	// Output: [.git .idea .vscode bar baz bin dist foo testdata vendor]
+}
+
+func TestAnticycle_filterAffected(t *testing.T) {
+	packages := []*model.Pkg{
+		{
+			Name: "bar",
+			Path: "/tmp/anticycle/skipNotAffected/bar",
+			Imports: map[string]*model.ImportInfo{
+				"/tmp/anticycle/skipNotAffected/baz": {
+					Name:      "/tmp/anticycle/skipNotAffected/baz",
+					NameShort: "baz",
+					Alias:     nil,
+				},
+				"/tmp/anticycle/skipNotAffected/foo": {
+					Name:      "/tmp/anticycle/skipNotAffected/foo",
+					NameShort: "foo",
+					Alias:     nil,
+				},
+			},
+			Files: []*model.File{
+				{
+					Path: "/tmp/anticycle/skipNotAffected/bar/bar.go",
+					Imports: []*model.ImportInfo{
+						{
+							Name:      "/tmp/anticycle/skipNotAffected/baz",
+							NameShort: "baz",
+							Alias:     nil,
+						},
+					},
+				},
+				{
+					Path: "/tmp/anticycle/skipNotAffected/bar/clean.go",
+					Imports: []*model.ImportInfo{
+						{
+							Name:      "/tmp/anticycle/skipNotAffected/foo",
+							NameShort: "baz",
+							Alias:     nil,
+						},
+					},
+				},
+			},
+			HaveCycle: true,
+			Cycles: []*model.Cycle{
+				{
+					AffectedFile: "/tmp/anticycle/skipNotAffected/bar/bar.go",
+					AffectedImport: &model.ImportInfo{
+						Name:      "/tmp/anticycle/skipNotAffected/baz",
+						NameShort: "baz",
+						Alias:     nil,
+					},
+				},
+			},
+		},
+		{
+			Name: "baz",
+			Path: "/tmp/anticycle/skipNotAffected/baz",
+			Imports: map[string]*model.ImportInfo{
+				"/tmp/anticycle/skipNotAffected/bar": {
+					Name:      "/tmp/anticycle/skipNotAffected/bar",
+					NameShort: "bar",
+					Alias:     nil,
+				},
+				"/tmp/anticycle/skipNotAffected/foo": {
+					Name:      "/tmp/anticycle/skipNotAffected/foo",
+					NameShort: "foo",
+					Alias:     nil,
+				},
+			},
+			Files: []*model.File{
+				{
+					Path: "/tmp/anticycle/skipNotAffected/baz/baz.go",
+					Imports: []*model.ImportInfo{
+						{
+							Name:      "/tmp/anticycle/skipNotAffected/bar",
+							NameShort: "bar",
+							Alias:     nil,
+						},
+						{
+							Name:      "/tmp/anticycle/skipNotAffected/foo",
+							NameShort: "foo",
+							Alias:     nil,
+						},
+					},
+				},
+			},
+			HaveCycle: true,
+			Cycles: []*model.Cycle{
+				{
+					AffectedFile: "/tmp/anticycle/skipNotAffected/baz/baz.go",
+					AffectedImport: &model.ImportInfo{
+						Name:      "/tmp/anticycle/skipNotAffected/bar",
+						NameShort: "bar",
+						Alias:     nil,
+					},
+				},
+			},
+		},
+		{
+			Name: "foo",
+			Path: "/tmp/anticycle/skipNotAffected/foo",
+			Files: []*model.File{
+				{
+					Path: "/tmp/anticycle/skipNotAffected/foo/foo.go",
+				},
+			},
+		},
+	}
+	result := onlyAffected(packages)
+	assert.Len(t, result, 2)
+
+	for _, pkg := range result {
+		t.Run(pkg.Name, func(t *testing.T) {
+			assert.Len(t, pkg.Files, 1)
+			assert.Len(t, pkg.Files[0].Imports, 1)
+			assert.Len(t, pkg.Imports, 1)
+			assert.Len(t, pkg.Cycles, 1)
+		})
+	}
 }
