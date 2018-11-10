@@ -9,6 +9,9 @@ help:
 deps: ## install development dependencies
 	./tools/deps.sh install
 
+clean-deps: ## uninstall development dependencies
+	./tools/deps.sh uninstall
+
 install: ## build and install project in OS
 	./build/install.sh ./cmd/anticycle
 
@@ -30,11 +33,10 @@ tarball: ## create tar.gz files
 	./build/tarball.sh ./dist
 
 test: ## run tests
-	go test -race -v ./pkg/...
-	go test -race -v ./internal/...
+	go test -race -covermode=atomic ./pkg/... ./internal/...
 
 test-sanity: ## run sanity tests on builded binary
-	go test -v ./test/sanity_test.go
+	go test ./test/sanity_test.go
 
 test-all: test test-sanity ## run all tests
 
@@ -42,15 +44,15 @@ golden-update: ## update golden files
 	go test ./test/sanity_test.go -update
 
 coverage: clean-coverage ## make test coverage report
-	go test -coverprofile=coverage.out ./...
-	go tool cover -html=coverage.out -o coverage.html
+	go test -race -covermode=atomic -coverprofile=coverage.out ./pkg/... ./internal/...
+	cover -html=coverage.out -o coverage.html
 
 clean-coverage: ## clean coverage report
 	rm -f *.out
 	rm -f coverage.html
 
 benchmark: ## run test benchmark
-	go test -run=xxx -bench=. ./... > new.bench
+	go test -run=xxx -bench=. ./pkg/... ./internal/... > new.bench
 	benchcmp old.bench new.bench
 
 benchmark-save: ## save new benchmark as old
