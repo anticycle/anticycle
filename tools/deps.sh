@@ -14,12 +14,22 @@ GOPATH=$(go env GOPATH)
 function install() {
     # golint
     go get -u golang.org/x/lint/golint
+
+    # golang tools
+    go get -u golang.org/x/tools/...
 }
 
 function uninstall() {
     # golint
     rm -rf ${GOPATH}/src/golang.org/x/lint
 	rm -f ${GOPATH}/bin/golint
+
+    # golang tools
+    rm -rf ${GOPATH}/src/golang.org/x/tools
+    cd ${GOPATH}/bin
+    rm -f benchcmp bundle callgraph compilebench cover digraph eg fiximports getgo \
+          go-contrib-init godex godoc goimports golsp gomvpkg gorename gotype goyacc \
+          guru heapview html2article present ssadump stress stringer tip toolstash vet vet-lite
 }
 
 while :; do
