@@ -6,21 +6,21 @@ GOPATH ?= `go env GOPATH`
 help:
 	@perl -nle'print $& if m{^[a-zA-Z_-]+:.*?## .*$$}' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-25s\033[0m %s\n", $$1, $$2}'
 
-deps: ## install development dependencies
-	./tools/deps.sh install
+devdeps: ## install development dependencies
+	./tools/devdeps.sh install
 
-clean-deps: ## uninstall development dependencies
-	./tools/deps.sh uninstall
+clean-devdeps: ## uninstall development dependencies
+	./tools/devdeps.sh uninstall
 
-install: ## build and install project in OS
+install: ## build and install project in $GOPATH/bin/
 	./build/install.sh ./cmd/anticycle
 
-uninstall: clean ## uninstall project from OS
+uninstall: clean ## uninstall project from $GOPATH/bin/
 	rm -f $(GOPATH)/bin/anticycle
 
 clean: clean-build ## remove artifacts
 	go clean
-	./tools/deps.sh uninstall
+	./tools/devdeps.sh uninstall
 
 build: clean ## create artifacts
 	./build/artifacts.sh ./dist ./cmd/anticycle

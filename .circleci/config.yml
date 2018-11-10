@@ -52,7 +52,7 @@ jobs:
     - checkout
     - run:
         name: Download dependencies
-        command: make deps
+        command: make devdeps
     - run:
         name: Run linters
         command: make lint
