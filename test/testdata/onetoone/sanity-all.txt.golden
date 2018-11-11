@@ -5,4 +5,8 @@ bar
 baz
   testdata/onetoone/baz/baz.go
     C "testdata/onetoone/bar"
+      "testdata/onetoone/foo"
+
+foo
+  testdata/onetoone/foo/foo.go
 

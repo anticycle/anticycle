@@ -35,28 +35,59 @@ func ExcludeDirs(custom []string) []string {
 // Analyze is a high level function which will parse recursively all .go files.
 // Will produce slice with information about packages, files and import statements.
 // Analyze will not compile the code. It looks only at imports in AST data.
-func Analyze(dir string, excludedDir []string, allPkgs bool) ([]*model.Pkg, error) {
+func Analyze(dir string, excludedDir []string, all bool) (result []*model.Pkg, err error) {
 	// TODO: make integration tests
 	packages, err := scan.FetchPackages(dir, excludedDir)
 	if err != nil {
-		return nil, err
+		return result, err
 	}
 
 	cycles, err := scan.FindCycles(packages)
 	if err != nil {
-		return nil, err
+		return result, err
 	}
 
-	var result []*model.Pkg
-	if allPkgs == false {
-		for _, pkg := range cycles {
-			if pkg.HaveCycle == true {
-				result = append(result, pkg)
-			}
-		}
-	} else {
+	if all {
 		result = cycles
+	} else {
+		result = onlyAffected(cycles)
 	}
+	return result, err
+}
 
-	return result, nil
+func onlyAffected(packages []*model.Pkg) []*model.Pkg {
+	var result []*model.Pkg
+	for _, pkg := range packages {
+		if pkg.HaveCycle {
+
+			imports := make(map[string]*model.ImportInfo, len(pkg.Cycles))
+			for _, cycle := range pkg.Cycles {
+				if imp, ok := pkg.Imports[cycle.AffectedImport.Name]; ok {
+					imports[cycle.AffectedImport.Name] = imp
+					break
+				}
+			}
+			pkg.Imports = imports
+
+			files := make([]*model.File, 0, len(pkg.Cycles))
+			for _, cycle := range pkg.Cycles {
+				for _, file := range pkg.Files {
+					if file.Path == cycle.AffectedFile {
+						fileImports := make([]*model.ImportInfo, 0, len(pkg.Cycles))
+						for _, imp := range file.Imports {
+							if _, ok := imports[imp.Name]; ok {
+								fileImports = append(fileImports, imp)
+							}
+						}
+						file.Imports = fileImports
+						files = append(files, file)
+						break
+					}
+				}
+			}
+			pkg.Files = files
+			result = append(result, pkg)
+		}
+	}
+	return result
 }

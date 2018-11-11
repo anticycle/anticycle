@@ -64,11 +64,11 @@ func FindCycles(packages []*model.Pkg) ([]*model.Pkg, error) {
 			packages[i].HaveCycle = true
 			// look at links to other packages
 			for j := 0; j < nodes; j++ {
-				if j != i && graph[i][j] == 1 {
+				if j != i && graph[i][j] == 1 && graph[j][i] == 1 {
 					// check which file is affected
 					for _, file := range packages[i].Files {
 						for _, imp := range file.Imports {
-							if strings.Contains(imp.NameShort, packages[j].Name) {
+							if imp.Name == packages[j].Path {
 								cycle := &model.Cycle{
 									AffectedFile:   file.Path,
 									AffectedImport: imp,

@@ -125,10 +125,13 @@ func main() {
 	cycles, err := anticycle.Analyze(dir, excluded, *all)
 	trap(err)
 
-	if strings.EqualFold(*format, "json") {
+	switch strings.ToLower(*format) {
+	case "json":
 		output, err = serialize.ToJSON(cycles)
-	} else {
+	case "text":
 		output, err = serialize.ToTxt(cycles)
+	default:
+		err = fmt.Errorf("-format='%v' is not available, try 'text' or 'json'", *format)
 	}
 	trap(err)
 	if output != "" {
