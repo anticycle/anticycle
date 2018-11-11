@@ -59,7 +59,6 @@ func onlyAffected(packages []*model.Pkg) []*model.Pkg {
 	var result []*model.Pkg
 	for _, pkg := range packages {
 		if pkg.HaveCycle {
-
 			imports := make(map[string]*model.ImportInfo, len(pkg.Cycles))
 			for _, cycle := range pkg.Cycles {
 				if imp, ok := pkg.Imports[cycle.AffectedImport.Name]; ok {
@@ -79,8 +78,10 @@ func onlyAffected(packages []*model.Pkg) []*model.Pkg {
 								fileImports = append(fileImports, imp)
 							}
 						}
-						file.Imports = fileImports
-						files = append(files, file)
+						if len(fileImports) > 0 {
+							file.Imports = fileImports
+							files = append(files, file)
+						}
 						break
 					}
 				}

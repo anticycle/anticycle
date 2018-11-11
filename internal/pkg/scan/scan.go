@@ -68,7 +68,7 @@ func FindCycles(packages []*model.Pkg) ([]*model.Pkg, error) {
 					// check which file is affected
 					for _, file := range packages[i].Files {
 						for _, imp := range file.Imports {
-							if imp.Name == packages[j].Path {
+							if strings.HasSuffix(imp.Name, packages[j].Path) {
 								cycle := &model.Cycle{
 									AffectedFile:   file.Path,
 									AffectedImport: imp,
