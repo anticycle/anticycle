@@ -35,7 +35,7 @@ func ExcludeDirs(custom []string) []string {
 // Analyze is a high level function which will parse recursively all .go files.
 // Will produce slice with information about packages, files and import statements.
 // Analyze will not compile the code. It looks only at imports in AST data.
-func Analyze(dir string, excludedDir []string, all bool) (result []*model.Pkg, err error) {
+func Analyze(dir string, excludedDir []string, all bool, related bool) (result []*model.Pkg, err error) {
 	// TODO: make integration tests
 	packages, err := scan.FetchPackages(dir, excludedDir)
 	if err != nil {
@@ -51,12 +51,16 @@ func Analyze(dir string, excludedDir []string, all bool) (result []*model.Pkg, e
 		result = cycles
 	} else {
 		result = onlyAffected(cycles)
+		if !related {
+			result = withoutRelated(result)
+		}
 	}
+
 	return result, err
 }
 
-func onlyAffected(packages []*model.Pkg) []*model.Pkg {
-	var result []*model.Pkg
+func onlyAffected(packages []*model.Pkg) (result []*model.Pkg) {
+	result = make([]*model.Pkg, 0, len(packages))
 	for _, pkg := range packages {
 		if pkg.HaveCycle {
 			imports := make(map[string]*model.ImportInfo, len(pkg.Cycles))
@@ -89,6 +93,52 @@ func onlyAffected(packages []*model.Pkg) []*model.Pkg {
 			pkg.Files = files
 			result = append(result, pkg)
 		}
+	}
+	return result
+}
+
+func withoutRelated(packages []*model.Pkg) (result []*model.Pkg) {
+	pkgToInt := make(map[string]int, len(packages))
+	cycleRefs := make(map[string][]string, len(packages))
+	for i, pkg := range packages {
+		if !pkg.HaveCycle {
+			continue
+		}
+
+		pkgToInt[pkg.Name] = i
+
+		if _, ok := cycleRefs[pkg.Name]; !ok {
+			cycleRefs[pkg.Name] = make([]string, 0, len(pkg.Cycles))
+		}
+		for _, cycle := range pkg.Cycles {
+			cycleRefs[pkg.Name] = append(cycleRefs[pkg.Name], cycle.AffectedImport.NameShort)
+		}
+	}
+
+	isInResult := make(map[int]interface{}, len(packages))
+	output := make([]int, 0, len(packages))
+	if len(cycleRefs) > 1 {
+		// Check if it is possible to return to the same package.
+		for from, to := range cycleRefs {
+			visited := map[string]interface{}{from: struct{}{}}
+			for _, imp := range to {
+				for _, next := range cycleRefs[imp] {
+					if _, ok := visited[next]; ok {
+						if _, ok := isInResult[pkgToInt[from]]; !ok {
+							output = append(output, pkgToInt[from])
+							isInResult[pkgToInt[from]] = struct{}{}
+						}
+						break
+					}
+				}
+			}
+		}
+	}
+
+	sort.Ints(output)
+	result = make([]*model.Pkg, 0, len(output))
+	for _, idx := range output {
+		result = append(result, packages[idx])
 	}
 	return result
 }
