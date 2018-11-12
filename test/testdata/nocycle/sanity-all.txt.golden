@@ -1,11 +1,7 @@
-bar
-  testdata/nocycle/bar/bar.go
-      "testdata/nocycle/foo"
+[bar -> foo] "testdata/nocycle/foo"
+   testdata/nocycle/bar/bar.go
 
-baz
-  testdata/nocycle/baz/baz.go
-      "testdata/nocycle/foo"
+[baz -> foo] "testdata/nocycle/foo"
+   testdata/nocycle/baz/baz.go
 
-foo
-  testdata/nocycle/foo/foo.go
 

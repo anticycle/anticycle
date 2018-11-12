@@ -1,8 +1,6 @@
-bar
-  testdata/notAffectedFiles/bar/bar.go
-    C "testdata/notAffectedFiles/baz"
+[bar -> baz] "testdata/notAffectedFiles/baz"
+   testdata/notAffectedFiles/bar/bar.go
 
-baz
-  testdata/notAffectedFiles/baz/baz.go
-    C "testdata/notAffectedFiles/bar"
+[baz -> bar] "testdata/notAffectedFiles/bar"
+   testdata/notAffectedFiles/baz/baz.go
 
