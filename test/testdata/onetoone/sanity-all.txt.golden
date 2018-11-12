@@ -1,12 +1,9 @@
-bar
-  testdata/onetoone/bar/bar.go
-    C "testdata/onetoone/baz"
+[bar -> baz] "testdata/onetoone/baz"
+   testdata/onetoone/bar/bar.go
 
-baz
-  testdata/onetoone/baz/baz.go
-    C "testdata/onetoone/bar"
-      "testdata/onetoone/foo"
+[baz -> bar] "testdata/onetoone/bar"
+   testdata/onetoone/baz/baz.go
+[baz -> foo] "testdata/onetoone/foo"
+   testdata/onetoone/baz/baz.go
 
-foo
-  testdata/onetoone/foo/foo.go
 

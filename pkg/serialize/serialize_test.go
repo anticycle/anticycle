@@ -152,7 +152,7 @@ func TestToTxt(t *testing.T) {
 			},
 		},
 	}
-	expected := "bar\n  /tmp/anticycle/skipNotAffected/bar/bar.go\n    C \"/tmp/anticycle/skipNotAffected/baz\"\n  /tmp/anticycle/skipNotAffected/bar/clean.go\n      \"/tmp/anticycle/skipNotAffected/foo\"\n\nbaz\n  /tmp/anticycle/skipNotAffected/baz/baz.go\n    C \"/tmp/anticycle/skipNotAffected/bar\"\n      \"/tmp/anticycle/skipNotAffected/foo\"\n\nfoo\n  /tmp/anticycle/skipNotAffected/foo/foo.go\n"
+	expected := "[bar -> baz] \"/tmp/anticycle/skipNotAffected/baz\"\n   /tmp/anticycle/skipNotAffected/bar/bar.go\n[bar -> foo] \"/tmp/anticycle/skipNotAffected/foo\"\n   /tmp/anticycle/skipNotAffected/bar/clean.go\n\n[baz -> bar] \"/tmp/anticycle/skipNotAffected/bar\"\n   /tmp/anticycle/skipNotAffected/baz/baz.go\n[baz -> foo] \"/tmp/anticycle/skipNotAffected/foo\"\n   /tmp/anticycle/skipNotAffected/baz/baz.go\n\n"
 
 	result, err := ToTxt(packages)
 	assert.NoError(t, err)

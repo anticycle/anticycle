@@ -8,6 +8,7 @@ package serialize
 import (
 	"encoding/json"
 	"fmt"
+	"sort"
 	"strings"
 
 	"github.com/anticycle/anticycle/pkg/model"
@@ -28,30 +29,66 @@ func ToJSON(packages []*model.Pkg) (string, error) {
 
 // ToTxt takes list of packages and produces human friendly text output.
 func ToTxt(packages []*model.Pkg) (string, error) {
-	output := make([]string, 0, len(packages))
-	for _, pkg := range packages {
-		fOutput := make([]string, 0)
-		cycles := make(map[string]bool, len(pkg.Cycles))
-		if pkg.HaveCycle == true {
-			for _, cycle := range pkg.Cycles {
-				cycles[cycle.AffectedImport.Name] = true
-			}
-		}
+	// Packages and Imports order are required for deterministic output.
+	// Without it we can't predict result due to dynamic nature of hash maps
+	// used to store input data.
+	pkgOrder := make([]string, 0, len(packages))
+	impsOrder := make(map[string][]string)
 
-		for _, file := range pkg.Files {
-			fOutput = append(fOutput, fmt.Sprintf("  %v", file.Path))
-			for _, imp := range file.Imports {
-				var format string
-				if _, ok := cycles[imp.Name]; ok {
-					format = "    C \"%v\""
-				} else {
-					format = "      \"%v\""
-				}
-				fOutput = append(fOutput, fmt.Sprintf(format, imp.Name))
+	// To easy create list of files grouped by imports per package
+	// we need to create input data based on slice of packages.
+	input := make(map[string]map[string][]string)
+	for _, pkg := range packages {
+		pkgOrder = append(pkgOrder, pkg.Name)
+		impsOrder[pkg.Name] = make([]string, 0)
+
+		if _, ok := input[pkg.Name]; !ok {
+			input[pkg.Name] = make(map[string][]string)
+			// Prepare upfront all imports with empty list of files
+			for imp := range pkg.Imports {
+				input[pkg.Name][imp] = make([]string, 0)
 			}
 		}
-		output = append(output, fmt.Sprintf("%v\n%v\n", pkg.Name, strings.Join(fOutput, "\n")))
+		// append all files to corresponding imports without duplicates
+		for _, file := range pkg.Files {
+			for _, imp := range file.Imports {
+				if !sliceContains(impsOrder[pkg.Name], imp.Name) {
+					impsOrder[pkg.Name] = append(impsOrder[pkg.Name], imp.Name)
+				}
+				if sliceContains(input[pkg.Name][imp.Name], file.Path) {
+					continue
+				}
+				input[pkg.Name][imp.Name] = append(input[pkg.Name][imp.Name], file.Path)
+			}
+		}
+	}
+
+	output := make([]string, 0)
+	for _, pkg := range pkgOrder {
+		var out []string
+		for _, imp := range impsOrder[pkg] {
+			files := input[pkg][imp]
+			impSegments := strings.Split(imp, "/")
+			out = append(out, fmt.Sprintf("[%s -> %s] \"%s\"\n", pkg, impSegments[len(impSegments)-1], imp))
+
+			var filesList []string
+			for _, file := range files {
+				filesList = append(filesList, fmt.Sprintf("   %s", file))
+			}
+			sort.Strings(filesList)
+			out = append(out, strings.Join(filesList, "\n"), "\n")
+		}
+		output = append(output, strings.Join(out, ""))
 	}
 
 	return strings.Join(output, "\n"), nil
+}
+
+func sliceContains(slice []string, str string) bool {
+	for _, s := range slice {
+		if s == str {
+			return true
+		}
+	}
+	return false
 }

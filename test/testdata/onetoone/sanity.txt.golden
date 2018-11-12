@@ -1,8 +1,6 @@
-bar
-  testdata/onetoone/bar/bar.go
-    C "testdata/onetoone/baz"
+[bar -> baz] "testdata/onetoone/baz"
+   testdata/onetoone/bar/bar.go
 
-baz
-  testdata/onetoone/baz/baz.go
-    C "testdata/onetoone/bar"
+[baz -> bar] "testdata/onetoone/bar"
+   testdata/onetoone/baz/baz.go
 
