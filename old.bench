@@ -1,16 +1,20 @@
-?   	github.com/anticycle/anticycle/cmd/anticycle	[no test files]
 goos: linux
 goarch: amd64
-pkg: github.com/anticycle/anticycle/internal/pkg/scan
-BenchmarkFindCycles_NoCycles-4         	 3000000	       457 ns/op	     104 B/op	       4 allocs/op
-BenchmarkFindCycles_OneToOne-4         	 2000000	       796 ns/op	     256 B/op	       6 allocs/op
-BenchmarkFindCycles_Triangle-4         	 1000000	      1010 ns/op	     335 B/op	       7 allocs/op
-BenchmarkFindCycles_DiagonalSquare-4   	 1000000	      1393 ns/op	     436 B/op	       9 allocs/op
+pkg: github.com/anticycle/anticycle/pkg/anticycle
+BenchmarkTestAnticycle_OnlyAffected-4     	 2000000	       610 ns/op	     576 B/op	       9 allocs/op
+BenchmarkTestAnticycle_WithoutRelated-4   	 2000000	       952 ns/op	     144 B/op	       6 allocs/op
 PASS
-ok  	github.com/anticycle/anticycle/internal/pkg/scan	6.740s
-PASS
-ok  	github.com/anticycle/anticycle/pkg/anticycle	0.003s
+ok  	github.com/anticycle/anticycle/pkg/anticycle	4.808s
 PASS
 ok  	github.com/anticycle/anticycle/pkg/model	0.003s
 PASS
 ok  	github.com/anticycle/anticycle/pkg/serialize	0.003s
+goos: linux
+goarch: amd64
+pkg: github.com/anticycle/anticycle/internal/pkg/scan
+BenchmarkFindCycles_NoCycles-4         	 3000000	       483 ns/op	     104 B/op	       4 allocs/op
+BenchmarkFindCycles_OneToOne-4         	 2000000	       841 ns/op	     256 B/op	       6 allocs/op
+BenchmarkFindCycles_Triangle-4         	 1000000	      1081 ns/op	     335 B/op	       7 allocs/op
+BenchmarkFindCycles_DiagonalSquare-4   	 1000000	      1489 ns/op	     436 B/op	       9 allocs/op
+PASS
+ok  	github.com/anticycle/anticycle/internal/pkg/scan	7.060s
