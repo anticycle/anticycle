@@ -19,7 +19,8 @@ anticycle [options] [directory]
 ### Options
 
 ```
--all               Output all packages. Default: false.
+-all               Output all packages, with and without cycles.
+
 -format            Output format. Available: text,json. Default: text.
 
 -exclude=""        A comma separated list of directories that should
@@ -46,11 +47,45 @@ Analyze recursively from current working directory but skip `internal/` anywhere
 $ anticycle -exclude="internal"
 ```
 
-Analyze recursively given directory
+Analyze recursively given directory with JSON output format
 
 ```console
-$ anticycle $GOPATH/src/github.com/anticycle/anticycle -all -format=json
+$ anticycle -all -format=json $GOPATH/src/github.com/anticycle/anticycle
 ```
+
+### Example output
+
+**Real case scenario:**
+
+Command without flags and directories.
+
+```console
+$ cd $GOPATH/src/github.com/Juniper/contrail
+$ anticycle
+[db -> models] "github.com/Juniper/contrail/pkg/models"
+   pkg/db/address_manager.go
+   pkg/db/address_manager_test.go
+   pkg/db/db.go
+   pkg/db/db_test.go
+   pkg/db/useragent_kv.go
+
+[models -> db] "github.com/Juniper/contrail/pkg/db"
+   pkg/models/validation.go
+
+```
+
+**How to read:**
+
+```console
+[package -> wants] "fully/qualified/import/name"
+   path/to/affected/file.go
+   path/to/another/file.go
+```
+
+This gives us a hint that few files in `db` package wants to import `models`, but
+`validation.go` file in `models` want to import `db` package.
+
+The cycle looks like: `db -> models -> db`.
 
 ## Development
 
@@ -62,7 +97,7 @@ Make sure you have GO in version 1.11. If not, [follow official instructions](ht
 
 ```console
 $ go get github.com/anticycle/anticycle
-$ make deps install
+$ make devdeps install
 ```
 
 After each change use `make install` to update dev binary. Then run sanity tests.
@@ -71,7 +106,7 @@ After each change use `make install` to update dev binary. Then run sanity tests
 ### Run tests
 
 ```console
-$ make test-all
+$ GOCACHE=off make test-all
 ```
 
 ### Build artifacts
