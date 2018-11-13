@@ -28,11 +28,7 @@ const helpText = `Usage: anticycle [options] [directory]
   so it is ideal for searching for complex, difficult to debug cycles.
 
 Options:
-  -all               Output all packages, with and without cycles.
-  -related           Output cycles and packages which lead to,
-                     but are not involved in cycle.
-                     Ignored if -all is present.
-
+  -all               Output all packages.
   -format="text"     Output format. Available: text, json.
 
   -exclude=""        A space-separated list of directories that should 
@@ -80,8 +76,7 @@ func main() {
 	ex := flag.String("exclude", "", "A space-separated list of directories")
 	exO := flag.String("excludeOnly", "", "A space-separated list of directories")
 	format := flag.String("format", "text", "Output format. Available: text,json")
-	all := flag.Bool("all", false, "Output all packages, implied related")
-	related := flag.Bool("related", false, "Include packages related to cycle")
+	all := flag.Bool("all", false, "Output all packages")
 	flag.Parse()
 
 	// SHOW HELP TEXT
@@ -127,7 +122,7 @@ func main() {
 	var output string
 
 	excluded := anticycle.ExcludeDirs(exclude)
-	cycles, err := anticycle.Analyze(dir, excluded, *all, *related)
+	cycles, err := anticycle.Analyze(dir, excluded, *all)
 	trap(err)
 
 	switch strings.ToLower(*format) {

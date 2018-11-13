@@ -19,11 +19,7 @@ anticycle [options] [directory]
 ### Options
 
 ```
--all               Output all packages, with and without cycles.
--related           Output cycles and packages which lead to,
-                   but are not involved in cycle.
-                   Ignored if -all is present.
-
+-all               Output all packages. Default: false.
 -format            Output format. Available: text,json. Default: text.
 
 -exclude=""        A comma separated list of directories that should
@@ -56,30 +52,6 @@ Analyze recursively given directory
 $ anticycle $GOPATH/src/github.com/anticycle/anticycle -all -format=json
 ```
 
-### Example output
-
-**How to read:**
-
-```console
-[package -> wants] "fully/qualified/import/name"
-   path/to/affected/file.go
-   path/to/another/file.go
-```
-
-**Real case output:**
-
-```console
-[db -> models] "github.com/Juniper/contrail/pkg/models"
-   pkg/db/address_manager.go
-   pkg/db/address_manager_test.go
-   pkg/db/db.go
-   pkg/db/db_test.go
-   pkg/db/useragent_kv.go
-
-[models -> db] "github.com/Juniper/contrail/pkg/db"
-   pkg/models/validation.go
-```
-
 ## Development
 
 **Require GO v1.11.x**
@@ -90,7 +62,7 @@ Make sure you have GO in version 1.11. If not, [follow official instructions](ht
 
 ```console
 $ go get github.com/anticycle/anticycle
-$ make devdeps install
+$ make deps install
 ```
 
 After each change use `make install` to update dev binary. Then run sanity tests.

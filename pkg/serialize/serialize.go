@@ -55,9 +55,10 @@ func ToTxt(packages []*model.Pkg) (string, error) {
 				if !sliceContains(impsOrder[pkg.Name], imp.Name) {
 					impsOrder[pkg.Name] = append(impsOrder[pkg.Name], imp.Name)
 				}
-				if !sliceContains(input[pkg.Name][imp.Name], file.Path) {
-					input[pkg.Name][imp.Name] = append(input[pkg.Name][imp.Name], file.Path)
+				if sliceContains(input[pkg.Name][imp.Name], file.Path) {
+					continue
 				}
+				input[pkg.Name][imp.Name] = append(input[pkg.Name][imp.Name], file.Path)
 			}
 		}
 	}
@@ -66,11 +67,12 @@ func ToTxt(packages []*model.Pkg) (string, error) {
 	for _, pkg := range pkgOrder {
 		var out []string
 		for _, imp := range impsOrder[pkg] {
+			files := input[pkg][imp]
 			impSegments := strings.Split(imp, "/")
 			out = append(out, fmt.Sprintf("[%s -> %s] \"%s\"\n", pkg, impSegments[len(impSegments)-1], imp))
 
 			var filesList []string
-			for _, file := range input[pkg][imp] {
+			for _, file := range files {
 				filesList = append(filesList, fmt.Sprintf("   %s", file))
 			}
 			sort.Strings(filesList)
