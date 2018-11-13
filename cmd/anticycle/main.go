@@ -28,7 +28,8 @@ const helpText = `Usage: anticycle [options] [directory]
   so it is ideal for searching for complex, difficult to debug cycles.
 
 Options:
-  -all               Output all packages.
+  -all               Output all packages, with and without cycles.
+
   -format="text"     Output format. Available: text, json.
 
   -exclude=""        A space-separated list of directories that should 
@@ -76,7 +77,7 @@ func main() {
 	ex := flag.String("exclude", "", "A space-separated list of directories")
 	exO := flag.String("excludeOnly", "", "A space-separated list of directories")
 	format := flag.String("format", "text", "Output format. Available: text,json")
-	all := flag.Bool("all", false, "Output all packages")
+	all := flag.Bool("all", false, "Output all packages, with and without cycles")
 	flag.Parse()
 
 	// SHOW HELP TEXT
