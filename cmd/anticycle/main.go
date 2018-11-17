@@ -59,7 +59,8 @@ Output:
   If you want to print all packages you can use -all flag.
 
   If Anticycle does not find any source files, it will exit 
-  with code 0 without output.
+  with code 0 without output in text format,
+  or with empty structure in JSON format.
   In case of error, the program will exit with code 1, and the error 
   message will be sent to stderr.`
 
@@ -123,14 +124,16 @@ func main() {
 	var output string
 
 	excluded := anticycle.ExcludeDirs(exclude)
-	cycles, err := anticycle.Analyze(dir, excluded, *all)
+	cycles, err := anticycle.Collect(dir, excluded, *all)
 	trap(err)
+
+	analysis := anticycle.Analyze(cycles)
 
 	switch strings.ToLower(*format) {
 	case "json":
-		output, err = serialize.ToJSON(cycles)
+		output, err = serialize.ToJSON(analysis)
 	case "text":
-		output, err = serialize.ToTxt(cycles)
+		output, err = serialize.ToTxt(analysis)
 	default:
 		err = fmt.Errorf("-format='%v' is not available, try 'text' or 'json'", *format)
 	}

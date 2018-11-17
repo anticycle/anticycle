@@ -100,6 +100,19 @@ func TestAnticycle(t *testing.T) {
 			args:   []string{"-format=json", "./testdata/notAffectedFiles"},
 			golden: filepath.Join("testdata", "notAffectedFiles", "sanity.json.golden"),
 		},
+
+		// external false positive cycle scenario
+		{
+			name:   "External false positive, output as text",
+			args:   []string{"-format=text", "./testdata/externalFalsePositive"},
+			golden: filepath.Join("testdata", "externalFalsePositive", "sanity.txt.golden"),
+		},
+		{
+			isJSON: true,
+			name:   "External false positive, output as JSON",
+			args:   []string{"-format=json", "./testdata/externalFalsePositive"},
+			golden: filepath.Join("testdata", "externalFalsePositive", "sanity.json.golden"),
+		},
 	}
 
 	for _, test := range tests {
@@ -116,10 +129,10 @@ func TestAnticycle(t *testing.T) {
 				json.Unmarshal(stdoutStderr, &result)
 				json.Unmarshal(golden, &expected)
 
-				assert.EqualValues(t, expected, result)
+				assert.Equal(t, expected, result)
 			} else {
 				expected, _ := ioutil.ReadFile(test.golden)
-				assert.Equal(t, expected, stdoutStderr)
+				assert.Equal(t, string(expected), string(stdoutStderr))
 			}
 		})
 	}

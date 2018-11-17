@@ -12,6 +12,17 @@ import (
 )
 
 type (
+	// AnalysisMeta is a metadata produced based on Analysis.
+	AnalysisMeta struct {
+		Cycles [][]string `json:"cycles"`
+	}
+
+	// Analysis holds final anticycle output.
+	Analysis struct {
+		Cycles   []*Pkg        `json:"cycles"`
+		Metadata *AnalysisMeta `json:"metadata"`
+	}
+
 	// ImportInfo holds information about import statements.
 	ImportInfo struct {
 		Name      string  `json:"name"`

@@ -3,5 +3,3 @@
 
 [baz -> foo] "testdata/nocycle/foo"
    testdata/nocycle/baz/baz.go
-
-

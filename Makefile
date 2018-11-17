@@ -13,7 +13,7 @@ clean-devdeps: ## uninstall development dependencies
 	./tools/devdeps.sh uninstall
 
 install: uninstall ## build and install project in $GOPATH/bin/
-	./build/install.sh ./cmd/anticycle
+	GOCACHE=off ./build/install.sh ./cmd/anticycle
 
 uninstall: ## uninstall project from $GOPATH/bin/
 	rm -f $(GOPATH)/bin/anticycle
@@ -23,7 +23,7 @@ clean: clean-build ## remove artifacts
 	./tools/devdeps.sh uninstall
 
 build: clean ## create artifacts
-	./build/artifacts.sh ./dist ./cmd/anticycle
+	GOCACHE=off ./build/artifacts.sh ./dist ./cmd/anticycle
 
 clean-build: ## remove linker artifacts
 	rm -rf ./dist/
@@ -33,10 +33,10 @@ tarball: ## create tar.gz files
 	./build/tarball.sh ./dist
 
 test: ## run tests
-	go test -race -covermode=atomic ./pkg/... ./internal/...
+	GOCACHE=off go test -race -covermode=atomic ./pkg/... ./internal/...
 
 test-sanity: ## run sanity tests on builded binary
-	go test ./test/sanity_test.go
+	GOCACHE=off go test ./test/sanity_test.go
 
 test-all: test test-sanity ## run all tests
 

@@ -22,3 +22,6 @@ indent_size = 2
 
 [*.{scss,js}]
 indent_size = 2
+
+[*.golden]
+insert_final_newline = false

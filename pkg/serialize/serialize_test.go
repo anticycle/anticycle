@@ -16,145 +16,123 @@ func TestToJSON(t *testing.T) {
 	pkg := model.NewPkg()
 	pkg.Name = "test/pkg"
 	pkg.Imports = map[string]*model.ImportInfo{"internal": model.NewImportInfo(nil)}
+	analysis := &model.Analysis{
+		Cycles:   []*model.Pkg{pkg},
+		Metadata: &model.AnalysisMeta{Cycles: [][]string{}},
+	}
 
-	packages := []*model.Pkg{pkg}
-	jsonStr, err := ToJSON(packages)
+	jsonStr, err := ToJSON(analysis)
 	assert.NoError(t, err)
 
-	expected := `[{"name":"test/pkg","path":"","imports":{"internal":null},"files":[],"haveCycle":false}]`
+	expected := `{"cycles":[{"name":"test/pkg","path":"","imports":{"internal":null},"files":[],"haveCycle":false}],"metadata":{"cycles":[]}}`
 	assert.Equal(t, expected, jsonStr)
 }
 
-func TestToJSON_WithNilInput(t *testing.T) {
-	jsonStr, err := ToJSON(nil)
-	assert.NoError(t, err)
-	assert.Equal(t, "", jsonStr)
-}
-
 func TestToJSON_WithEmptyInput(t *testing.T) {
-	jsonStr, err := ToJSON([]*model.Pkg{})
+	analysis := &model.Analysis{
+		Cycles:   []*model.Pkg{},
+		Metadata: &model.AnalysisMeta{Cycles: [][]string{}},
+	}
+
+	jsonStr, err := ToJSON(analysis)
 	assert.NoError(t, err)
-	assert.Equal(t, "", jsonStr)
+	assert.Equal(t, "{\"cycles\":[],\"metadata\":{\"cycles\":[]}}", jsonStr)
 }
 
 func ExampleToJSON() {
 	pkg := model.NewPkg()
 	pkg.Name = "test/pkg"
 	pkg.Imports = map[string]*model.ImportInfo{"internal": model.NewImportInfo(nil)}
+	analysis := &model.Analysis{
+		Cycles:   []*model.Pkg{pkg},
+		Metadata: &model.AnalysisMeta{Cycles: [][]string{}},
+	}
 
-	jsonStr, _ := ToJSON([]*model.Pkg{pkg})
+	jsonStr, _ := ToJSON(analysis)
 	fmt.Print(jsonStr)
-	// Output: [{"name":"test/pkg","path":"","imports":{"internal":null},"files":[],"haveCycle":false}]
+	// Output: {"cycles":[{"name":"test/pkg","path":"","imports":{"internal":null},"files":[],"haveCycle":false}],"metadata":{"cycles":[]}}
 }
 
 func TestToTxt(t *testing.T) {
-	packages := []*model.Pkg{
-		{
-			Name: "bar",
-			Path: "/tmp/anticycle/skipNotAffected/bar",
-			Imports: map[string]*model.ImportInfo{
-				"/tmp/anticycle/skipNotAffected/baz": {
-					Name:      "/tmp/anticycle/skipNotAffected/baz",
-					NameShort: "baz",
-					Alias:     nil,
+	analysis := &model.Analysis{
+		Cycles: []*model.Pkg{
+			{
+				Name: "bar",
+				Path: "/tmp/anticycle/skipNotAffected/bar",
+				Imports: map[string]*model.ImportInfo{
+					"/tmp/anticycle/skipNotAffected/baz": {
+						Name:      "/tmp/anticycle/skipNotAffected/baz",
+						NameShort: "baz",
+						Alias:     nil,
+					},
 				},
-				"/tmp/anticycle/skipNotAffected/foo": {
-					Name:      "/tmp/anticycle/skipNotAffected/foo",
-					NameShort: "foo",
-					Alias:     nil,
+				Files: []*model.File{
+					{
+						Path: "/tmp/anticycle/skipNotAffected/bar/bar.go",
+						Imports: []*model.ImportInfo{
+							{
+								Name:      "/tmp/anticycle/skipNotAffected/baz",
+								NameShort: "baz",
+								Alias:     nil,
+							},
+						},
+					},
 				},
-			},
-			Files: []*model.File{
-				{
-					Path: "/tmp/anticycle/skipNotAffected/bar/bar.go",
-					Imports: []*model.ImportInfo{
-						{
+				HaveCycle: true,
+				Cycles: []*model.Cycle{
+					{
+						AffectedFile: "/tmp/anticycle/skipNotAffected/bar/bar.go",
+						AffectedImport: &model.ImportInfo{
 							Name:      "/tmp/anticycle/skipNotAffected/baz",
 							NameShort: "baz",
 							Alias:     nil,
 						},
 					},
 				},
-				{
-					Path: "/tmp/anticycle/skipNotAffected/bar/clean.go",
-					Imports: []*model.ImportInfo{
-						{
-							Name:      "/tmp/anticycle/skipNotAffected/foo",
-							NameShort: "foo",
-							Alias:     nil,
-						},
-					},
-				},
 			},
-			HaveCycle: true,
-			Cycles: []*model.Cycle{
-				{
-					AffectedFile: "/tmp/anticycle/skipNotAffected/bar/bar.go",
-					AffectedImport: &model.ImportInfo{
-						Name:      "/tmp/anticycle/skipNotAffected/baz",
-						NameShort: "baz",
-						Alias:     nil,
-					},
-				},
-			},
-		},
-		{
-			Name: "baz",
-			Path: "/tmp/anticycle/skipNotAffected/baz",
-			Imports: map[string]*model.ImportInfo{
-				"/tmp/anticycle/skipNotAffected/bar": {
-					Name:      "/tmp/anticycle/skipNotAffected/bar",
-					NameShort: "bar",
-					Alias:     nil,
-				},
-				"/tmp/anticycle/skipNotAffected/foo": {
-					Name:      "/tmp/anticycle/skipNotAffected/foo",
-					NameShort: "foo",
-					Alias:     nil,
-				},
-			},
-			Files: []*model.File{
-				{
-					Path: "/tmp/anticycle/skipNotAffected/baz/baz.go",
-					Imports: []*model.ImportInfo{
-						{
-							Name:      "/tmp/anticycle/skipNotAffected/bar",
-							NameShort: "bar",
-							Alias:     nil,
-						},
-						{
-							Name:      "/tmp/anticycle/skipNotAffected/foo",
-							NameShort: "foo",
-							Alias:     nil,
-						},
-					},
-				},
-			},
-			HaveCycle: true,
-			Cycles: []*model.Cycle{
-				{
-					AffectedFile: "/tmp/anticycle/skipNotAffected/baz/baz.go",
-					AffectedImport: &model.ImportInfo{
+			{
+				Name: "baz",
+				Path: "/tmp/anticycle/skipNotAffected/baz",
+				Imports: map[string]*model.ImportInfo{
+					"/tmp/anticycle/skipNotAffected/bar": {
 						Name:      "/tmp/anticycle/skipNotAffected/bar",
 						NameShort: "bar",
 						Alias:     nil,
 					},
 				},
-			},
-		},
-		{
-			Name: "foo",
-			Path: "/tmp/anticycle/skipNotAffected/foo",
-			Files: []*model.File{
-				{
-					Path: "/tmp/anticycle/skipNotAffected/foo/foo.go",
+				Files: []*model.File{
+					{
+						Path: "/tmp/anticycle/skipNotAffected/baz/baz.go",
+						Imports: []*model.ImportInfo{
+							{
+								Name:      "/tmp/anticycle/skipNotAffected/bar",
+								NameShort: "bar",
+								Alias:     nil,
+							},
+						},
+					},
+				},
+				HaveCycle: true,
+				Cycles: []*model.Cycle{
+					{
+						AffectedFile: "/tmp/anticycle/skipNotAffected/baz/baz.go",
+						AffectedImport: &model.ImportInfo{
+							Name:      "/tmp/anticycle/skipNotAffected/bar",
+							NameShort: "bar",
+							Alias:     nil,
+						},
+					},
 				},
 			},
 		},
+		Metadata: &model.AnalysisMeta{Cycles: [][]string{
+			{"bar", "baz", "bar"},
+			{"baz", "bar", "baz"},
+		}},
 	}
-	expected := "[bar -> baz] \"/tmp/anticycle/skipNotAffected/baz\"\n   /tmp/anticycle/skipNotAffected/bar/bar.go\n[bar -> foo] \"/tmp/anticycle/skipNotAffected/foo\"\n   /tmp/anticycle/skipNotAffected/bar/clean.go\n\n[baz -> bar] \"/tmp/anticycle/skipNotAffected/bar\"\n   /tmp/anticycle/skipNotAffected/baz/baz.go\n[baz -> foo] \"/tmp/anticycle/skipNotAffected/foo\"\n   /tmp/anticycle/skipNotAffected/baz/baz.go\n\n"
+	expected := "Found 2 cycles\n\nbar -> baz -> bar\nbaz -> bar -> baz\n\nDetails\n\n[bar -> baz] \"/tmp/anticycle/skipNotAffected/baz\"\n   /tmp/anticycle/skipNotAffected/bar/bar.go\n\n[baz -> bar] \"/tmp/anticycle/skipNotAffected/bar\"\n   /tmp/anticycle/skipNotAffected/baz/baz.go"
 
-	result, err := ToTxt(packages)
+	result, err := ToTxt(analysis)
 	assert.NoError(t, err)
 	assert.Equal(t, expected, result)
 }

@@ -1,3 +1,10 @@
+Found 2 cycles
+
+bar -> baz -> bar
+baz -> bar -> baz
+
+Details
+
 [bar -> baz] "testdata/onetoone/baz"
    testdata/onetoone/bar/bar.go
 
@@ -5,5 +12,3 @@
    testdata/onetoone/baz/baz.go
 [baz -> foo] "testdata/onetoone/foo"
    testdata/onetoone/baz/baz.go
-
-
