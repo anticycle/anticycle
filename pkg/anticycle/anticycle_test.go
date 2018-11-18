@@ -149,3 +149,56 @@ func TestAnticycle_filterAffected(t *testing.T) {
 		})
 	}
 }
+
+func TestSortMetaCycles(t *testing.T) {
+	tests := []struct {
+		name       string
+		metaCycles [][]string
+		expected   [][]string
+	}{
+		{
+			name: "bar baz bar",
+			metaCycles: [][]string{
+				{"bar", "baz", "bar"},
+				{"baz", "bar", "baz"},
+			},
+			expected: [][]string{
+				{"bar", "baz", "bar"},
+				{"baz", "bar", "baz"},
+			},
+		},
+		{
+			name: "baz bar baz",
+			metaCycles: [][]string{
+				{"baz", "bar", "baz"},
+				{"bar", "baz", "bar"},
+			},
+			expected: [][]string{
+				{"bar", "baz", "bar"},
+				{"baz", "bar", "baz"},
+			},
+		},
+		{
+			name: "a b c ",
+			metaCycles: [][]string{
+				{"b", "c", "a", "c"},
+				{"c", "a", "c"},
+				{"a", "c", "b", "c"},
+				{"c", "b", "c"},
+			},
+			expected: [][]string{
+				{"a", "c", "b", "c"},
+				{"b", "c", "a", "c"},
+				{"c", "a", "c"},
+				{"c", "b", "c"},
+			},
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			result := sortMetaCycles(tt.metaCycles)
+			assert.Equal(t, tt.expected, result)
+		})
+	}
+}
