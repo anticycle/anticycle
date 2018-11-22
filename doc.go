@@ -20,7 +20,7 @@ package anticycle
 
 // Imports for godoc to follow packages
 import (
-	"github.com/anticycle/anticycle/pkg/anticycle"
-	"github.com/anticycle/anticycle/pkg/model"
-	"github.com/anticycle/anticycle/pkg/serialize"
+	_ "github.com/anticycle/anticycle/pkg/anticycle"
+	_ "github.com/anticycle/anticycle/pkg/model"
+	_ "github.com/anticycle/anticycle/pkg/serialize"
 )
