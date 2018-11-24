@@ -93,11 +93,20 @@ The cycle looks like: `db -> models -> db`.
 
 Make sure you have GO in version 1.11. If not, [follow official instructions](https://golang.org/doc/install).
 
+### Makefile
+
+Use `Make` to run tests, benchmarks, build process and more.
+
+```console
+$ sudo apt install make
+$ make help
+```
+
 ### Download project
 
 ```console
 $ go get github.com/anticycle/anticycle
-$ make devdeps install
+$ make devdeps install test-all
 ```
 
 After each change use `make install` to update dev binary. Then run sanity tests.
@@ -106,7 +115,8 @@ After each change use `make install` to update dev binary. Then run sanity tests
 ### Run tests
 
 ```console
-$ GOCACHE=off make test-all
+$ make test
+$ make test-sanity
 ```
 
 ### Build artifacts
@@ -114,7 +124,7 @@ $ GOCACHE=off make test-all
 Artifacts will be moved to /bin directory after building.
 
 ```console
-$ make build
+$ make build tarball
 ```
 
 ## Contribution
