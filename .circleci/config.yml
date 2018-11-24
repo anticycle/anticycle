@@ -78,6 +78,19 @@ jobs:
         name: Run sanity tests
         command: make test-sanity
 
+  acceptance-tests:
+    <<: *defaults
+    steps:
+      - checkout
+      - attach_workspace:
+          at: /tmp/artifacts
+      - run:
+          name: Move artifacts to executable path
+          command: cp /tmp/artifacts/anticycle-*.linux-amd64 /go/bin/anticycle
+      - run:
+          name: Run acceptance tests
+          command: make test-acceptance
+
   release:
     <<: *releasing
     steps:
@@ -103,34 +116,41 @@ workflows:
         filters:
           tags:
             only: /.*/
+
     - unit-tests:
         requires:
         - build
         filters:
           tags:
             only: /.*/
+
     - lint:
         requires:
         - build
         filters:
           tags:
             only: /.*/
+
     - sanity-tests:
         requires:
         - build
         filters:
           tags:
             only: /.*/
-# TODO (pawelzny): Add job: acceptance-tests with full coverage for CLI
-#    - acceptance-tests:
-#        requires:
-#        - sanity-tests
+    - acceptance-tests:
+        requires:
+        - unit-tests
+        - sanity-tests
+        filters:
+          tags:
+            only: /.*/
+
     - release:
         requires:
         - unit-tests
         - lint
         - sanity-tests
-#        - acceptance-tests
+        - acceptance-tests
         filters:
           branches:
             ignore: /.*/
