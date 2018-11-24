@@ -20,7 +20,10 @@ test: ## run tests
 test-sanity: ## run sanity tests on builded binary
 	go test ./test/sanity_test.go
 
-test-all: test test-sanity ## run all tests
+test-acceptance: ## run acceptance tests on builded binary
+	go test ./test/acceptance_*_test.go
+
+test-all: test test-sanity test-acceptance ## run all tests
 
 golden-update: ## update golden files
 	go test ./test/sanity_test.go -update
