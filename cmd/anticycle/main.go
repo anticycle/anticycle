@@ -7,6 +7,7 @@
 package main
 
 import (
+	"encoding/json"
 	"flag"
 	"fmt"
 	"os"
@@ -89,7 +90,15 @@ func main() {
 
 	// SHOW VERSION
 	if *showVersion == true {
-		fmt.Fprintln(os.Stdout, fmt.Sprintf("Anticycle version %s, build %s", version, build))
+		var ver string
+		if strings.ToLower(*format) == "json" {
+			verJSON, _ := json.Marshal(map[string]string{"version": version, "build": build})
+			ver = string(verJSON)
+		} else {
+			ver = fmt.Sprintf("Anticycle version %s, build %s", version, build)
+		}
+
+		fmt.Fprintln(os.Stdout, ver)
 		os.Exit(0)
 	}
 
