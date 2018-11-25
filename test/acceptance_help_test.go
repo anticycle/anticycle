@@ -31,15 +31,15 @@ func TestAnticycleHelp_ShouldPrintHelpText(t *testing.T) {
 		},
 		{
 			name: "Show help and excludeOnly",
-			args: []string{"-help", "-excludeOnly=''"},
+			args: []string{"-help", "-excludeDefault=''"},
 		},
 		{
 			name: "Show help and exclude and excludeOnly",
-			args: []string{"-help", "-exclude=''", "-excludeOnly=''"},
+			args: []string{"-help", "-exclude=''", "-excludeDefault=''"},
 		},
 		{
 			name: "Show help and showExclude",
-			args: []string{"-help", "-showExclude"},
+			args: []string{"-help", "-showExcluded"},
 		},
 		{
 			name: "Show help and all",
@@ -51,7 +51,7 @@ func TestAnticycleHelp_ShouldPrintHelpText(t *testing.T) {
 		},
 		{
 			name: "Show help with everything",
-			args: []string{"-help", "-exclude=''", "-excludeOnly=''", "-all", "./testdata"},
+			args: []string{"-help", "-exclude=''", "-excludeDefault=''", "-all", "./testdata"},
 		},
 	}
 

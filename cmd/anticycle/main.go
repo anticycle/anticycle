@@ -29,19 +29,19 @@ const helpText = `Usage: anticycle [options] [directory]
   so it is ideal for searching for complex, difficult to debug cycles.
 
 Options:
-  -all               Output all packages, with and without cycles.
+  -all                 Output all packages, with and without cycles.
 
-  -format="text"     Output format. Available: text, json.
+  -format="text"       Output format. Available: text, json.
 
-  -exclude=""        A space-separated list of directories that should 
-                     not be scanned. The list will be added to the 
-                     default list of directories.
-  -excludeOnly=""    A space-separated list of directories that should 
-                     not be scanned. The list will override the default.
-  -showExclude       Shows default list of excluded directories.
+  -exclude=""          A space-separated list of directories that should 
+                       not be scanned. The list will be added to the 
+                       default list of directories.
+  -excludeDefault=""   A space-separated list of directories that should 
+                       not be scanned. The list will override the default.
+  -showExcluded        Shows list of excluded directories.
 
-  -help              Shows this help text.
-  -version           Shows version and build hash.
+  -help                Shows this help text.
+  -version             Shows version and build hash.
 
 Directory:
   An optional path to the analyzed project. If the directory is not 
@@ -67,88 +67,134 @@ Output:
 
 func trap(err error) {
 	if err != nil {
-		fmt.Fprintln(os.Stderr, err)
+		_, fatal := fmt.Fprintln(os.Stderr, err)
+		if fatal != nil {
+			panic(fatal)
+		}
 		os.Exit(1)
 	}
 }
 
 func main() {
-	showHelp := flag.Bool("help", false, "Show help text")
-	showVersion := flag.Bool("version", false, "Show version tag")
-	showEx := flag.Bool("showExclude", false, "Show default list of excluded directories")
-	ex := flag.String("exclude", "", "A space-separated list of directories")
-	exO := flag.String("excludeOnly", "", "A space-separated list of directories")
-	format := flag.String("format", "text", "Output format. Available: text,json")
-	all := flag.Bool("all", false, "Output all packages, with and without cycles")
+	showHelp := flag.Bool("help", false, "Show help text.")
+	showVersion := flag.Bool("version", false, "Show version and build hash.")
+	showExcluded := flag.Bool("showExcluded", false, "Show list of excluded directories.")
+
+	setExclude := flag.String("exclude", "/", "A space-separated list of directories.")
+	setExcludeDefault := flag.String("excludeDefault", "/", "A space-separated list of directories.")
+
+	outputFormat := flag.String("format", "text", "Output format. Available: text,json.")
+	outputAll := flag.Bool("all", false, "Output all packages, with and without cycles.")
 	flag.Parse()
 
-	// SHOW HELP TEXT
+	var err error
+
+	err = validateFormat(*outputFormat)
+	trap(err)
+
 	if *showHelp == true {
-		fmt.Fprintln(os.Stdout, helpText)
+		err = printOutput(renderHelp())
+		trap(err)
 		os.Exit(0)
 	}
 
-	// SHOW VERSION
 	if *showVersion == true {
-		var ver string
-		if strings.ToLower(*format) == "json" {
-			verJSON, _ := json.Marshal(map[string]string{"version": version, "build": build})
-			ver = string(verJSON)
-		} else {
-			ver = fmt.Sprintf("Anticycle version %s, build %s", version, build)
-		}
-
-		fmt.Fprintln(os.Stdout, ver)
+		err = printOutput(renderVersion(*outputFormat))
+		trap(err)
 		os.Exit(0)
 	}
 
-	// SHOW DEFAULT EXCLUDED DIRECTORIES
-	if *showEx == true {
-		fmt.Fprintln(os.Stdout, strings.Join(anticycle.DefaultExcluded, "\n"))
+	excluded := excludedDirs(*setExclude, *setExcludeDefault)
+	if *showExcluded == true {
+		err = printOutput(renderExcluded(*outputFormat, excluded))
+		trap(err)
 		os.Exit(0)
 	}
 
-	// EXCLUDE ONLY
-	exclude := make([]string, 0)
-	if *exO != "" {
-		paths := strings.Trim(*exO, "\"'")
+	dir := rootDir(flag.Args())
+	output, err := findCycles(dir, excluded, *outputFormat, *outputAll)
+	trap(err)
+
+	err = printOutput(output)
+	trap(err)
+
+	os.Exit(0)
+}
+
+func validateFormat(format string) (err error) {
+	if !strings.EqualFold(format, "json") && !strings.EqualFold(format, "text") {
+		err = fmt.Errorf("-format='%v' is not available, try 'text' or 'json'", format)
+	}
+	return err
+}
+
+func renderHelp() string {
+	// TODO(pawelzny) support for JSON output format.
+	return helpText
+}
+
+func renderVersion(format string) string {
+	if strings.ToLower(format) == "json" {
+		verJSON, _ := json.Marshal(map[string]string{"version": version, "build": build})
+		return string(verJSON)
+	}
+	return fmt.Sprintf("Anticycle version %s, build %s", version, build)
+}
+
+func renderExcluded(format string, excluded []string) string {
+	if strings.ToLower(format) == "json" {
+		exJSON, _ := json.Marshal(map[string][]string{"excluded": excluded})
+		return string(exJSON)
+	}
+	if len(excluded) == 0 {
+		return ""
+	}
+	return strings.Join(excluded, "\n")
+}
+
+func excludedDirs(setExclude, setExcludeDefault string) (exclude []string) {
+	if setExcludeDefault == "" {
+		anticycle.DefaultExcluded = []string{}
+	} else if setExcludeDefault != "/" {
+		paths := strings.Trim(setExcludeDefault, "\"'")
 		anticycle.DefaultExcluded = strings.Split(paths, " ")
 	}
 
-	// EXCLUDE
-	if *ex != "" {
-		paths := strings.Trim(*ex, "\"'")
-		exclude = append(exclude, strings.Split(paths, " ")...)
+	if setExclude != "/" {
+		paths := strings.Trim(setExclude, "\"'")
+		exclude = strings.Split(paths, " ")
 	}
 
-	// DIRECTORY
-	var dir string
-	if len(flag.Args()) > 0 {
-		dir = path.Clean(flag.Args()[0])
-	} else {
-		dir = "."
+	return anticycle.ExcludeDirs(exclude)
+}
+
+func rootDir(args []string) string {
+	if len(args) > 0 {
+		return path.Clean(args[0])
 	}
+	return "."
+}
 
-	var err error
-	var output string
-
-	excluded := anticycle.ExcludeDirs(exclude)
-	cycles, err := anticycle.Collect(dir, excluded, *all)
-	trap(err)
-
+func findCycles(dir string, excluded []string, format string, all bool) (output string, err error) {
+	cycles, err := anticycle.Collect(dir, excluded, all)
+	if err != nil {
+		return output, err
+	}
 	analysis := anticycle.Analyze(cycles)
 
-	switch strings.ToLower(*format) {
+	switch strings.ToLower(format) {
 	case "json":
 		output, err = serialize.ToJSON(analysis)
 	case "text":
 		output, err = serialize.ToTxt(analysis)
-	default:
-		err = fmt.Errorf("-format='%v' is not available, try 'text' or 'json'", *format)
 	}
-	trap(err)
+
+	return output, err
+}
+
+func printOutput(output string) (err error) {
 	if output != "" {
-		fmt.Fprintln(os.Stdout, output)
+		_, err = fmt.Fprintln(os.Stdout, output)
 	}
-	os.Exit(0)
+	return err
 }
