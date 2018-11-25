@@ -1,7 +1,11 @@
 # Anticycle
 
 [![Godoc](https://godoc.org/github.com/anticycle/anticycle?status.svg)](https://godoc.org/github.com/anticycle/anticycle)
-[![CircleCI](https://circleci.com/gh/anticycle/anticycle.svg?style=svg)](https://circleci.com/gh/anticycle/anticycle)
+[![CircleCI](https://circleci.com/gh/anticycle/anticycle.svg?style=shield)](https://circleci.com/gh/anticycle/anticycle)
+[![Goreportcard](https://goreportcard.com/badge/github.com/anticycle/anticycle)](https://goreportcard.com/report/github.com/anticycle/anticycle)
+[![Release](https://img.shields.io/github/release/anticycle/anticycle.svg)](https://github.com/anticycle/anticycle/releases/latest)
+[![License](https://img.shields.io/github/license/anticycle/anticycle.svg)](https://github.com/anticycle/anticycle/blob/master/LICENSE)
+[![Platforms](https://img.shields.io/badge/platforms-linux%20%7C%20osx%20%7C%20windows-red.svg)](https://github.com/anticycle/anticycle/releases/latest)
 
 Anticycle is a tool for static code analysis which search for
 dependency cycles. It scans recursively all source files and
@@ -43,13 +47,13 @@ defined, the current working directory will be used.
 
 Analyze recursively from current working directory but skip `internal/` anywhere in dir tree.
 
-```console
+```bash
 $ anticycle -exclude="internal"
 ```
 
 Analyze recursively given directory with JSON output format
 
-```console
+```bash
 $ anticycle -all -format=json $GOPATH/src/github.com/anticycle/anticycle
 ```
 
@@ -59,9 +63,18 @@ $ anticycle -all -format=json $GOPATH/src/github.com/anticycle/anticycle
 
 Command without flags and directories.
 
-```console
+```
 $ cd $GOPATH/src/github.com/Juniper/contrail
 $ anticycle
+Found 4 cycles
+
+db -> models -> db
+ipam -> models -> db -> models
+models -> db -> models
+services -> models -> db -> models
+
+Details
+
 [db -> models] "github.com/Juniper/contrail/pkg/models"
    pkg/db/address_manager.go
    pkg/db/address_manager_test.go
@@ -72,11 +85,18 @@ $ anticycle
 [models -> db] "github.com/Juniper/contrail/pkg/db"
    pkg/models/validation.go
 
+[services -> models] "github.com/Juniper/contrail/pkg/models"
+   pkg/services/contrail_service_test.go
+   pkg/services/event_test.go
+   pkg/services/list_response_test.go
+
+[ipam -> models] "github.com/Juniper/contrail/pkg/models"
+   pkg/types/ipam/address_manager.go
 ```
 
 **How to read:**
 
-```console
+```
 [package -> wants] "fully/qualified/import/name"
    path/to/affected/file.go
    path/to/another/file.go
@@ -97,14 +117,14 @@ Make sure you have GO in version 1.11. If not, [follow official instructions](ht
 
 Use `Make` to run tests, benchmarks, build process and more.
 
-```console
-$ sudo apt install make
+```bash
+sudo apt install make
 $ make help
 ```
 
 ### Download project
 
-```console
+```bash
 $ go get github.com/anticycle/anticycle
 $ make devdeps install test-all
 ```
@@ -114,16 +134,23 @@ After each change use `make install` to update dev binary. Then run sanity tests
 
 ### Run tests
 
-```console
+Make sure you had installed anticycle in your OS before run sanity or acceptance tests.
+
+```bash
+$ make test-unit test-sanity test-acceptance
+```
+
+or just
+
+```bash
 $ make test
-$ make test-sanity
 ```
 
 ### Build artifacts
 
 Artifacts will be moved to /bin directory after building.
 
-```console
+```bash
 $ make build tarball
 ```
 
