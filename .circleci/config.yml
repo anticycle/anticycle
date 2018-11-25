@@ -63,7 +63,7 @@ jobs:
     - checkout
     - run:
         name: Run unit tests
-        command: make test
+        command: make test-unit
 
   sanity-tests:
     <<: *defaults

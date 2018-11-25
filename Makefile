@@ -14,16 +14,16 @@ install: uninstall ## build and install project in $GOPATH/bin/
 
 ##@ Testing
 
-test: ## run tests
+test: test-unit test-sanity test-acceptance ## run all tests
+
+test-unit: ## run unit tests
 	go test -race -covermode=atomic ./pkg/... ./internal/...
 
-test-sanity: ## run sanity tests on builded binary
+test-sanity: ## run sanity tests on built binary file
 	go test ./test/sanity_test.go
 
-test-acceptance: ## run acceptance tests on builded binary
+test-acceptance: ## run acceptance tests on built binary file
 	go test ./test/acceptance_*_test.go
-
-test-all: test test-sanity test-acceptance ## run all tests
 
 golden-update: ## update golden files
 	go test ./test/sanity_test.go -update
@@ -44,7 +44,7 @@ benchmark-save: ## save new benchmark as old
 build: clean ## create artifacts
 	./build/artifacts.sh ./dist ./cmd/anticycle
 
-tarball: ## create tar.gz files
+tarball: ## compress built artifacts to tar.gz archives
 	rm -rf ./dist/release
 	./build/tarball.sh ./dist
 

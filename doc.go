@@ -3,7 +3,7 @@
 // license that can be found in the LICENSE file.
 
 /*
-Anticycle is a tool for static code analysis which search for
+Package anticycle is a tool for static code analysis which search for
 dependency cycles. It scans recursively all source files and
 parses theirs dependencies. Anticycle does not compile the code,
 so it is ideal for searching for complex, difficult to debug cycles.
@@ -20,7 +20,7 @@ package anticycle
 
 // Imports for godoc to follow packages
 import (
-	_ "github.com/anticycle/anticycle/pkg/anticycle"
-	_ "github.com/anticycle/anticycle/pkg/model"
-	_ "github.com/anticycle/anticycle/pkg/serialize"
+	_ "github.com/anticycle/anticycle/pkg/anticycle" // golint:nocheck
+	_ "github.com/anticycle/anticycle/pkg/model"     // golint:nocheck
+	_ "github.com/anticycle/anticycle/pkg/serialize" // golint:nocheck
 )

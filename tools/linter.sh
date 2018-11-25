@@ -16,6 +16,7 @@ function check_vet() {
 # https://github.com/golang/lint
 function check_golint() {
     echo "Check: golint"
+    golint -set_exit_status "$1/doc.go"
     for dir in  "${@:2}"
     do
         golint -set_exit_status "$1$dir/..."
@@ -42,7 +43,7 @@ FAILED=0
 
 # Prepare relative path to match project root directory
 current_dir=$(pwd)
-if [ -z "${current_dir##*tools*}" ]; then
+if [[ -z "${current_dir##*tools*}" ]]; then
     # if "tools" in pwd then we want to go one directory up
     root_dir="../"
 else
