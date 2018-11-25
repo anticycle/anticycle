@@ -30,15 +30,15 @@ func TestAnticycleVersion_ShouldPrintVersion(t *testing.T) {
 		},
 		{
 			name: "Show version and excludeOnly",
-			args: []string{"-version", "-excludeOnly=''"},
+			args: []string{"-version", "-excludeDefault=''"},
 		},
 		{
 			name: "Show version and exclude and excludeOnly",
-			args: []string{"-version", "-exclude=''", "-excludeOnly=''"},
+			args: []string{"-version", "-exclude=''", "-excludeDefault=''"},
 		},
 		{
 			name: "Show version and showExclude",
-			args: []string{"-version", "-showExclude"},
+			args: []string{"-version", "-showExcluded"},
 		},
 		{
 			name: "Show version and all",
@@ -50,7 +50,7 @@ func TestAnticycleVersion_ShouldPrintVersion(t *testing.T) {
 		},
 		{
 			name: "Show version with everything",
-			args: []string{"-version", "-exclude=''", "-excludeOnly=''", "-all", "./testdata"},
+			args: []string{"-version", "-exclude=''", "-excludeDefault=''", "-all", "./testdata"},
 		},
 	}
 	validVersion := regexp.MustCompile(fullVersionRegex)

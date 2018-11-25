@@ -23,19 +23,19 @@ anticycle [options] [directory]
 ### Options
 
 ```
--all               Output all packages, with and without cycles.
+-all                 Output all packages, with and without cycles.
 
--format            Output format. Available: text,json. Default: text.
+-format="text"       Output format. Available: text, json.
 
--exclude=""        A comma separated list of directories that should
-                   not be scanned. The list will be added to the
-                   default list of directories.
--excludeOnly=""    A comma separated list of directories that should
-                   not be scanned. The list will override the default.
--showExclude       Shows default list of excluded directories.
+-exclude=""          A space-separated list of directories that should 
+                     not be scanned. The list will be added to the 
+                     default list of directories.
+-excludeDefault=""   A space-separated list of directories that should 
+                     not be scanned. The list will override the default.
+-showExcluded        Shows list of excluded directories.
 
--help              Shows this help text.
--version           Shows version tag.
+-help                Shows this help text.
+-version             Shows version and build hash.
 ```
 
 ### Directory

@@ -184,7 +184,7 @@ func TestCorruptedFiles(t *testing.T) {
 }
 
 func TestShowExclude(t *testing.T) {
-	cmd := exec.Command("anticycle", "-showExclude")
+	cmd := exec.Command("anticycle", "-showExcluded")
 	stdoutStderr, err := cmd.CombinedOutput()
 	assert.NoError(t, err)
 
