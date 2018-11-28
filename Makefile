@@ -20,13 +20,13 @@ test-unit: ## run unit tests
 	go test -race -covermode=atomic ./pkg/... ./internal/...
 
 test-sanity: ## run sanity tests on built binary file
-	go test ./test/sanity_test.go
+	go test ./test/cfg_test.go ./test/sanity_test.go
 
 test-acceptance: ## run acceptance tests on built binary file
-	go test ./test/acceptance_*_test.go
+	go test ./test/cfg_test.go ./test/acceptance_*_test.go
 
 golden-update: ## update golden files
-	go test ./test/sanity_test.go -update
+	go test ./test/cfg_test.go ./test/sanity_test.go ./test/acceptance_*_test.go -update
 
 coverage: clean-coverage ## make test coverage report
 	go test -race -covermode=atomic -coverprofile=coverage.out ./pkg/... ./internal/...

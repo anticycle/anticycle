@@ -1,4 +1,8 @@
 #!/usr/bin/env bash
+# Copyright 2018 The Anticycle Authors. All rights reserved.
+# Use of this source code is governed by a GPL-style
+# license that can be found in the LICENSE file.
+#
 # Build binaries for each OS and architecture
 declare -a OSARCHS=("linux/amd64" "linux/arm" "darwin/amd64" "windows/amd64")
 version=($("$(dirname "$0")/version.sh"))
