@@ -1,0 +1,12 @@
+Found 2 cycles
+
+left -> right -> left
+right -> left -> right
+
+Details
+
+[left -> right] "testdata/excludeDirs/right"
+   testdata/excludeDirs/left/left.go
+
+[right -> left] "testdata/excludeDirs/left"
+   testdata/excludeDirs/right/right.go

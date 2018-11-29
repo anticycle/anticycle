@@ -1,8 +1,11 @@
+// Copyright 2018 The Anticycle Authors. All rights reserved.
+// Use of this source code is governed by a GPL-style
+// license that can be found in the LICENSE file.
+
 package test
 
 import (
 	"encoding/json"
-	"flag"
 	"fmt"
 	"io/ioutil"
 	"os/exec"
@@ -14,8 +17,6 @@ import (
 	"github.com/anticycle/anticycle/pkg/model"
 	"github.com/stretchr/testify/assert"
 )
-
-var update = flag.Bool("update", false, "update .golden files")
 
 func TestNoGoFiles(t *testing.T) {
 	cmd := exec.Command("anticycle", "./testdata/empty")

@@ -1,0 +1,25 @@
+Found 2 cycles
+
+left -> right -> left
+right -> left -> right
+
+Details
+
+[main -> top] "testdata/excludeDirs/top"
+   testdata/excludeDirs/cmd/app/main.go
+[main -> bottom] "testdata/excludeDirs/bottom"
+   testdata/excludeDirs/cmd/app/main.go
+[main -> left] "testdata/excludeDirs/left"
+   testdata/excludeDirs/cmd/app/main.go
+[main -> right] "testdata/excludeDirs/right"
+   testdata/excludeDirs/cmd/app/main.go
+
+[left -> right] "testdata/excludeDirs/right"
+   testdata/excludeDirs/left/left.go
+
+[right -> left] "testdata/excludeDirs/left"
+   testdata/excludeDirs/right/right.go
+[right -> back] "back"
+   testdata/excludeDirs/right/right.go
+[right -> front] "front"
+   testdata/excludeDirs/right/right.go
