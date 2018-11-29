@@ -1,0 +1,8 @@
+[bar -> foo] "testdata/diagonal/foo"
+   testdata/diagonal/bar/bar.go
+
+[baz -> bar] "testdata/diagonal/bar"
+   testdata/diagonal/baz/baz.go
+
+[pas -> baz] "testdata/diagonal/baz"
+   testdata/diagonal/pas/pas.go

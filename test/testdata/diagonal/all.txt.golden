@@ -1,0 +1,20 @@
+Found 4 cycles
+
+bar -> foo -> pas -> baz -> bar
+baz -> bar -> foo -> pas -> baz
+foo -> pas -> baz -> bar -> foo
+pas -> baz -> bar -> foo -> pas
+
+Details
+
+[bar -> foo] "testdata/diagonal/foo"
+   testdata/diagonal/bar/bar.go
+
+[baz -> bar] "testdata/diagonal/bar"
+   testdata/diagonal/baz/baz.go
+
+[foo -> pas] "testdata/diagonal/pas"
+   testdata/diagonal/foo/foo.go
+
+[pas -> baz] "testdata/diagonal/baz"
+   testdata/diagonal/pas/pas.go

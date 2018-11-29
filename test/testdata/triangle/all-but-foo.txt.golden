@@ -1,0 +1,5 @@
+[bar -> foo] "testdata/triangle/foo"
+   testdata/triangle/bar/bar.go
+
+[baz -> bar] "testdata/triangle/bar"
+   testdata/triangle/baz/baz.go

@@ -1,0 +1,5 @@
+[bar -> foo] "testdata/nocycle/foo"
+   testdata/nocycle/bar/bar.go
+
+[baz -> foo] "testdata/nocycle/foo"
+   testdata/nocycle/baz/baz.go

@@ -5,7 +5,6 @@
 package test
 
 import (
-	"io/ioutil"
 	"os/exec"
 	"path/filepath"
 	"testing"
@@ -67,9 +66,9 @@ func TestAnticycleExcludeDirs(t *testing.T) {
 			stdOut, err := exec.Command("anticycle", test.args...).Output()
 			assert.NoError(t, err)
 			if *update {
-				ioutil.WriteFile(test.golden, stdOut, 0644)
+				updateGolden(test.golden, stdOut)
 			}
-			expected, _ := ioutil.ReadFile(test.golden)
+			expected := readGolden(test.golden)
 			assert.Equal(t, string(expected), string(stdOut))
 		})
 	}
