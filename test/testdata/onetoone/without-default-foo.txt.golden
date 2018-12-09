@@ -1,0 +1,12 @@
+Found 2 cycles
+
+bar -> baz -> bar
+baz -> bar -> baz
+
+Details
+
+[bar -> baz] "testdata/onetoone/baz"
+   testdata/onetoone/bar/bar.go
+
+[baz -> bar] "testdata/onetoone/bar"
+   testdata/onetoone/baz/baz.go

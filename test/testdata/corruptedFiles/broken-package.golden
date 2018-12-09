@@ -1,0 +1,1 @@
+testdata/corruptedFiles/brokenPackage/brokenPackage.go:5:1: expected 'package', found pakage

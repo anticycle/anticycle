@@ -1,0 +1,16 @@
+Found 2 cycles
+
+bar -> baz -> bar
+baz -> bar -> baz
+
+Details
+
+[bar -> baz] "testdata/notAffectedFiles/baz"
+   testdata/notAffectedFiles/bar/bar.go
+[bar -> foo] "testdata/notAffectedFiles/foo"
+   testdata/notAffectedFiles/bar/clean.go
+
+[baz -> bar] "testdata/notAffectedFiles/bar"
+   testdata/notAffectedFiles/baz/baz.go
+[baz -> foo] "testdata/notAffectedFiles/foo"
+   testdata/notAffectedFiles/baz/baz.go

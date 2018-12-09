@@ -7,14 +7,12 @@ package test
 import (
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
 	"os/exec"
 	"path/filepath"
 	"strings"
 	"testing"
 
 	"github.com/anticycle/anticycle/pkg/anticycle"
-	"github.com/anticycle/anticycle/pkg/model"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -75,7 +73,6 @@ func TestAnticycle(t *testing.T) {
 			args:   []string{"-format=text", "./testdata/onetoone"},
 			golden: filepath.Join("testdata", "onetoone", "sanity.txt.golden"),
 		},
-
 		{
 			isJSON: true,
 			name:   "One-to-one cycle, output all as JSON",
@@ -118,22 +115,25 @@ func TestAnticycle(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			cmd := exec.Command("anticycle", test.args...)
-			stdoutStderr, err := cmd.CombinedOutput()
+			stdOut, err := exec.Command("anticycle", test.args...).Output()
 			assert.NoError(t, err)
 			if *update {
-				ioutil.WriteFile(test.golden, stdoutStderr, 0644)
+				updateGolden(test.golden, stdOut)
 			}
 			if test.isJSON {
-				var expected, result []model.Pkg
-				golden, _ := ioutil.ReadFile(test.golden)
-				json.Unmarshal(stdoutStderr, &result)
-				json.Unmarshal(golden, &expected)
+				var expected, result map[string]interface{}
+				golden := readGolden(test.golden)
+				if err := json.Unmarshal(stdOut, &result); err != nil {
+					panic(err)
+				}
+				if err := json.Unmarshal(golden, &expected); err != nil {
+					panic(err)
+				}
 
 				assert.Equal(t, expected, result)
 			} else {
-				expected, _ := ioutil.ReadFile(test.golden)
-				assert.Equal(t, string(expected), string(stdoutStderr))
+				expected := readGolden(test.golden)
+				assert.Equal(t, string(expected), string(stdOut))
 			}
 		})
 	}
@@ -154,32 +154,31 @@ func TestDefaultExclude(t *testing.T) {
 }
 
 func TestCorruptedFiles(t *testing.T) {
-	cases := []struct {
-		Name, Golden string
-		Args         []string
+	tests := []struct {
+		name, golden string
+		args         []string
 	}{
 		{
-			Name:   "Broken import clause",
-			Args:   []string{"./testdata/corruptedFiles/brokenImport"},
-			Golden: filepath.Join("testdata", "corruptedFiles", "sanity-brokenImport.golden"),
+			name:   "Broken import clause",
+			args:   []string{"./testdata/corruptedFiles/brokenImport"},
+			golden: filepath.Join("testdata", "corruptedFiles", "sanity-brokenImport.golden"),
 		},
 		{
-			Name:   "Broken package clause",
-			Args:   []string{"./testdata/corruptedFiles/brokenPackage"},
-			Golden: filepath.Join("testdata", "corruptedFiles", "sanity-brokenPackage.golden"),
+			name:   "Broken package clause",
+			args:   []string{"./testdata/corruptedFiles/brokenPackage"},
+			golden: filepath.Join("testdata", "corruptedFiles", "sanity-brokenPackage.golden"),
 		},
 	}
 
-	for _, c := range cases {
-		t.Run(c.Name, func(t *testing.T) {
-			cmd := exec.Command("anticycle", c.Args...)
-			stdoutStderr, err := cmd.CombinedOutput()
-			assert.NotNil(t, err)
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			stdErr, err := exec.Command("anticycle", test.args...).CombinedOutput()
+			assert.Error(t, err)
 			if *update {
-				ioutil.WriteFile(c.Golden, stdoutStderr, 0644)
+				updateGolden(test.golden, stdErr)
 			}
-			expected, _ := ioutil.ReadFile(c.Golden)
-			assert.Equal(t, expected, stdoutStderr)
+			expected := readGolden(test.golden)
+			assert.Equal(t, expected, stdErr)
 		})
 	}
 }
