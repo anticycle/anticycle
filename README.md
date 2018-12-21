@@ -14,6 +14,14 @@ so it is ideal for searching for complex, difficult to debug cycles.
 
 Anticycle is published under GNU GENERAL PUBLIC LICENSE Version 3, from 29 June 2007
 
+## Installation
+
+**You may need sudo privileges to unpack into system specific directories.**
+
+1. Download binary from [latest release](https://github.com/anticycle/anticycle/releases/latest).
+2. Unpack binary to your PATH for example: `tar xvf anticycle.linux-amd64.tar.gz -C /usr/local/bin`
+3. Verify installation: `anticycle -version`
+
 ## Usage
 
 ```
